@@ -1,0 +1,534 @@
+unit PalmPDB;
+
+interface
+
+uses
+  System.SysUtils, System.Classes, System.Generics.Collections;
+
+type
+  TVexedInfo = class // Marked by General, followed by KV stream
+  strict private
+    FAuthor: String;
+    FUrl: String;
+    FDescription: String;
+  end;
+
+  TVexedLevel = class // Marked by Level, followed by KV stream
+  strict private
+    FBoard: String;
+    FSolution: String;
+    FTitle: String;
+
+  end;
+
+  TVexedPack = class // A Vexed pack containing Info and multiple levels
+  strict private
+    FInfo: TVexedInfo;
+    FLevels: TObjectList<TVexedLevel>;
+  end;
+
+  TPDBRecord = class
+  public
+    Attributes: Byte;      // Record attribute flags (high nibble) + category (low)
+    UniqueID: Cardinal;    // 3-byte unique record ID (0..$FFFFFF)
+    Data: TBytes;          // Raw record payload
+    function IsDeleted: Boolean;
+    function IsDirty: Boolean;
+    function IsBusy: Boolean;
+    function IsSecret: Boolean;
+    function DecodeVexedData: TVexedPack;
+  end;
+
+  TPDBFile = class
+  private
+    FRecords: TObjectList<TPDBRecord>;
+    function GetRecord(Index: Integer): TPDBRecord;
+    function GetRecordCount: Integer;
+  public
+    { Header fields }
+    Name: string;
+    Attributes: Word;
+    Version: Word;
+    CreationDate: TDateTime;
+    ModificationDate: TDateTime;
+    LastBackupDate: TDateTime;
+    ModificationNumber: Cardinal;
+    appInfoID: Cardinal;           // offset to start of Application Info (if present) or null
+    sortInfoID: Cardinal;          // offset to start of Sort Info (if present) or null
+    DBType: string;                // 4-char type
+    Creator: string;               // 4-char creator ID
+    UniqueIDSeed: Cardinal;        // used internally to identify record
+
+    AppInfoBlock: TBytes;
+    SortInfoBlock: TBytes;
+
+    constructor Create;
+    destructor Destroy; override;
+
+    { Loading }
+    procedure LoadFromStream(Stream: TStream);
+    procedure LoadFromFile(const AFileName: string);
+
+    { Saving — recomputes all offsets }
+    procedure SaveToStream(Stream: TStream);
+    procedure SaveToFile(const AFileName: string);
+
+    function AddRecord: TPDBRecord;
+
+    property Records: TObjectList<TPDBRecord> read FRecords;
+    property Record_[Index: Integer]: TPDBRecord read GetRecord; default;
+    property RecordCount: Integer read GetRecordCount;
+
+    function IsResourceDatabase: Boolean;
+  end;
+
+{ Convenience: decode a PDB file from disk in one call. }
+function DecodePDBFile(const AFileName: string): TPDBFile;
+
+implementation
+
+const
+  dmHdrAttrResDB = $0001;
+
+  PDB_HEADER_SIZE   = 78; // fixed header up to record-list header
+  RECLIST_HDR_SIZE  = 6;  // nextRecordListID(4) + numRecords(2)
+  RECLIST_ENTRY_SIZE = 8; // offset(4) + attr(1) + uniqueID(3)
+
+{ ============================================================
+  Endianness helpers.
+
+  PDB files are ALWAYS big-endian. We convert to/from the host's
+  native byte order. On the little-endian targets Delphi actually
+  supports these swap; the conditional keeps the code correct even
+  if compiled for a hypothetical big-endian target.
+  ============================================================ }
+
+{$IFDEF BIGENDIAN}
+function ToBE16(V: Word): Word; inline; begin Result := V; end;
+function ToBE32(V: Cardinal): Cardinal; inline; begin Result := V; end;
+function FromBE16(V: Word): Word; inline; begin Result := V; end;
+function FromBE32(V: Cardinal): Cardinal; inline; begin Result := V; end;
+{$ELSE}
+
+{$R-}  // disable range checking for the swap routines
+{$Q-}  // disable overflow checking
+
+function SwapW(V: Word): Word; inline;
+begin
+  Result := ((V and $00FF) shl 8) or ((V and $FF00) shr 8);
+end;
+
+function SwapD(V: Cardinal): Cardinal; inline;
+begin
+  Result := ((V and $000000FF) shl 24) or
+            ((V and $0000FF00) shl 8)  or
+            ((V and $00FF0000) shr 8)  or
+            ((V and $FF000000) shr 24);
+end;
+
+{$IFDEF RANGECHECKS_ON}{$R+}{$ENDIF}   // (optional) restore if you track it
+{$IFDEF OVERFLOWCHECKS_ON}{$Q+}{$ENDIF}
+
+function ToBE16(V: Word): Word; inline;         begin Result := SwapW(V); end;
+function ToBE32(V: Cardinal): Cardinal; inline; begin Result := SwapD(V); end;
+function FromBE16(V: Word): Word; inline;       begin Result := SwapW(V); end;
+function FromBE32(V: Cardinal): Cardinal; inline; begin Result := SwapD(V); end;
+{$ENDIF}
+
+{ ---- Big-endian stream primitives ---- }
+
+function ReadU8(Stream: TStream): Byte;
+begin
+  Stream.ReadBuffer(Result, 1);
+end;
+
+function ReadU16(Stream: TStream): Word;
+var Raw: Word;
+begin
+  Stream.ReadBuffer(Raw, 2);
+  Result := FromBE16(Raw);
+end;
+
+function ReadU32(Stream: TStream): Cardinal;
+var Raw: Cardinal;
+begin
+  Stream.ReadBuffer(Raw, 4);
+  Result := FromBE32(Raw);
+end;
+
+procedure WriteU8(Stream: TStream; V: Byte);
+begin
+  Stream.WriteBuffer(V, 1);
+end;
+
+procedure WriteU16(Stream: TStream; V: Word);
+var Raw: Word;
+begin
+  Raw := ToBE16(V);
+  Stream.WriteBuffer(Raw, 2);
+end;
+
+procedure WriteU32(Stream: TStream; V: Cardinal);
+var Raw: Cardinal;
+begin
+  Raw := ToBE32(V);
+  Stream.WriteBuffer(Raw, 4);
+end;
+
+function ReadFixedString(Stream: TStream; Len: Integer): string;
+var
+  Buf: TBytes;
+  I: Integer;
+begin
+  SetLength(Buf, Len);
+  Stream.ReadBuffer(Buf[0], Len);
+  I := 0;
+  while (I < Len) and (Buf[I] <> 0) do
+    Inc(I);
+  Result := TEncoding.ANSI.GetString(Buf, 0, I);
+end;
+
+procedure WriteFixedString(Stream: TStream; const S: string; Len: Integer);
+var
+  Buf: TBytes;
+  Src: TBytes;
+  N: Integer;
+begin
+  SetLength(Buf, Len);            // zero-filled
+  FillChar(Buf[0], Len, 0);
+  Src := TEncoding.ANSI.GetBytes(S);
+  N := Length(Src);
+  if N > Len then
+    N := Len;                     // truncate; leaves room for null
+  if N > 0 then
+    Move(Src[0], Buf[0], N);
+  Stream.WriteBuffer(Buf[0], Len);
+end;
+
+{ ---- Date conversion (Palm epoch = 1904-01-01) ---- }
+
+function PalmDateToDateTime(Seconds: Cardinal): TDateTime;
+const
+  SecondsPerDay = 86400.0;
+begin
+  if Seconds = 0 then
+    Exit(0);
+    if (Seconds and $80000000) = 0 then
+      Result := EncodeDate(1970, 1, 1) + (Seconds / SecondsPerDay)
+    else
+      Result := EncodeDate(1904, 1, 1) + (Seconds / SecondsPerDay)
+end;
+
+function DateTimeToPalmDate(DT: TDateTime): Cardinal;
+const
+  SecondsPerDay = 86400.0;
+var
+  Base: TDateTime;
+begin
+  if DT = 0 then
+    Exit(0);
+  Base := EncodeDate(1904, 1, 1);
+  if DT < Base then
+    Exit(0);
+  Result := Round((DT - Base) * SecondsPerDay);
+end;
+
+{ ============================================================
+  TPDBRecord
+  ============================================================ }
+
+function TPDBRecord.IsDeleted: Boolean; begin Result := (Attributes and $80) <> 0; end;
+function TPDBRecord.IsDirty: Boolean;   begin Result := (Attributes and $40) <> 0; end;
+
+function TPDBRecord.DecodeVexedData: TVexedPack;
+begin
+  // Todo
+end;
+
+function TPDBRecord.IsBusy: Boolean;    begin Result := (Attributes and $20) <> 0; end;
+function TPDBRecord.IsSecret: Boolean;  begin Result := (Attributes and $10) <> 0; end;
+
+{ ============================================================
+  TPDBFile
+  ============================================================ }
+
+constructor TPDBFile.Create;
+begin
+  inherited Create;
+  FRecords := TObjectList<TPDBRecord>.Create(True);
+end;
+
+destructor TPDBFile.Destroy;
+begin
+  FRecords.Free;
+  inherited;
+end;
+
+function TPDBFile.GetRecord(Index: Integer): TPDBRecord;
+begin
+  Result := FRecords[Index];
+end;
+
+function TPDBFile.GetRecordCount: Integer;
+begin
+  Result := FRecords.Count;
+end;
+
+function TPDBFile.IsResourceDatabase: Boolean;
+begin
+  Result := (Attributes and dmHdrAttrResDB) <> 0;
+end;
+
+function TPDBFile.AddRecord: TPDBRecord;
+begin
+  Result := TPDBRecord.Create;
+  FRecords.Add(Result);
+end;
+
+{ ---- Loading ---- }
+
+procedure TPDBFile.LoadFromStream(Stream: TStream);
+var
+  I: Integer;
+  NumRecords: Word;
+  RecOffsets: array of Cardinal;
+  RecAttribs: array of Byte;
+  RecUniqueIDs: array of Cardinal;
+  IDBuf: array[0..3] of Byte;
+  DataStart, DataEnd, DataLen: Cardinal;
+  Rec: TPDBRecord;
+  FileSize: Int64;
+begin
+  FRecords.Clear;
+  FileSize := Stream.Size;
+  if FileSize < PDB_HEADER_SIZE + RECLIST_HDR_SIZE then
+    raise Exception.Create('File too small to be a valid PDB.');
+
+  { ----- Header ----- }
+  Name := ReadFixedString(Stream, 32);
+  Attributes := ReadU16(Stream);
+  Version := ReadU16(Stream);
+  CreationDate := PalmDateToDateTime(ReadU32(Stream));
+  ModificationDate := PalmDateToDateTime(ReadU32(Stream));
+  LastBackupDate := PalmDateToDateTime(ReadU32(Stream));
+  ModificationNumber := ReadU32(Stream);
+  AppInfoID := ReadU32(Stream);
+  SortInfoID := ReadU32(Stream);
+  DBType := ReadFixedString(Stream, 4);
+  Creator := ReadFixedString(Stream, 4);
+  UniqueIDSeed := ReadU32(Stream);
+
+  { ----- Record list header ----- }
+  ReadU32(Stream);                 // nextRecordListID (ignored, expect 0)
+  NumRecords := ReadU16(Stream);
+
+  SetLength(RecOffsets, NumRecords);
+  SetLength(RecAttribs, NumRecords);
+  SetLength(RecUniqueIDs, NumRecords);
+
+  for I := 0 to NumRecords - 1 do
+  begin
+    RecOffsets[I] := ReadU32(Stream);
+    Stream.ReadBuffer(IDBuf[0], 4);
+    RecAttribs[I] := IDBuf[0];
+    RecUniqueIDs[I] := (Cardinal(IDBuf[1]) shl 16) or
+                       (Cardinal(IDBuf[2]) shl 8)  or
+                        Cardinal(IDBuf[3]);
+  end;
+
+  { ----- AppInfo / SortInfo ----- }
+  AppInfoBlock := nil;
+  SortInfoBlock := nil;
+
+  if AppInfoID > 0 then
+  begin
+    if SortInfoID > 0 then
+      DataEnd := SortInfoID
+    else if NumRecords > 0 then
+      DataEnd := RecOffsets[0]
+    else
+      DataEnd := Cardinal(FileSize);
+    if DataEnd > AppInfoID then
+    begin
+      DataLen := DataEnd - AppInfoID;
+      SetLength(AppInfoBlock, DataLen);
+      Stream.Position := AppInfoID;
+      Stream.ReadBuffer(AppInfoBlock[0], DataLen);
+    end;
+  end;
+
+  if SortInfoID > 0 then
+  begin
+    if NumRecords > 0 then
+      DataEnd := RecOffsets[0]
+    else
+      DataEnd := Cardinal(FileSize);
+    if DataEnd > SortInfoID then
+    begin
+      DataLen := DataEnd - SortInfoID;
+      SetLength(SortInfoBlock, DataLen);
+      Stream.Position := SortInfoID;
+      Stream.ReadBuffer(SortInfoBlock[0], DataLen);
+    end;
+  end;
+
+  { ----- Record data ----- }
+  for I := 0 to NumRecords - 1 do
+  begin
+    DataStart := RecOffsets[I];
+    if I < NumRecords - 1 then
+      DataEnd := RecOffsets[I + 1]
+    else
+      DataEnd := Cardinal(FileSize);
+
+    if (DataEnd < DataStart) or (DataStart > FileSize) then
+      raise Exception.CreateFmt('Corrupt record offsets at record %d.', [I]);
+
+    DataLen := DataEnd - DataStart;
+    Rec := TPDBRecord.Create;
+    Rec.Attributes := RecAttribs[I];
+    Rec.UniqueID := RecUniqueIDs[I];
+    SetLength(Rec.Data, DataLen);
+    if DataLen > 0 then
+    begin
+      Stream.Position := DataStart;
+      Stream.ReadBuffer(Rec.Data[0], DataLen);
+    end;
+    FRecords.Add(Rec);
+  end;
+end;
+
+procedure TPDBFile.LoadFromFile(const AFileName: string);
+var
+  Stream: TFileStream;
+begin
+  Stream := TFileStream.Create(AFileName, fmOpenRead or fmShareDenyWrite);
+  try
+    LoadFromStream(Stream);
+  finally
+    Stream.Free;
+  end;
+end;
+
+{ ---- Saving ----
+
+  Layout produced:
+    [header 78][record list hdr 6][record entries N*8]
+    [2 pad bytes]           <- conventional gap after record list
+    [AppInfo][SortInfo]
+    [record data ...]
+
+  All offsets are computed here so callers never manage them. }
+
+procedure TPDBFile.SaveToStream(Stream: TStream);
+const
+  RECLIST_GAP = 2; // traditional 2-byte filler between list and data
+var
+  I: Integer;
+  NumRecords: Word;
+  AppInfoID, SortInfoID: Cardinal;
+  Cursor: Cardinal;                 // running offset of the data region
+  RecOffsets: array of Cardinal;
+  Attr: Byte;
+  UID: Cardinal;
+begin
+  NumRecords := FRecords.Count;
+  SetLength(RecOffsets, NumRecords);
+
+  { Compute where variable data begins. }
+  Cursor := PDB_HEADER_SIZE + RECLIST_HDR_SIZE +
+            Cardinal(NumRecords) * RECLIST_ENTRY_SIZE + RECLIST_GAP;
+
+  if Length(AppInfoBlock) > 0 then
+  begin
+    AppInfoID := Cursor;
+    Inc(Cursor, Length(AppInfoBlock));
+  end
+  else
+    AppInfoID := 0;
+
+  if Length(SortInfoBlock) > 0 then
+  begin
+    SortInfoID := Cursor;
+    Inc(Cursor, Length(SortInfoBlock));
+  end
+  else
+    SortInfoID := 0;
+
+  for I := 0 to NumRecords - 1 do
+  begin
+    RecOffsets[I] := Cursor;
+    Inc(Cursor, Length(FRecords[I].Data));
+  end;
+
+  { ----- Header ----- }
+  WriteFixedString(Stream, Name, 32);
+  WriteU16(Stream, Attributes);
+  WriteU16(Stream, Version);
+  WriteU32(Stream, DateTimeToPalmDate(CreationDate));
+  WriteU32(Stream, DateTimeToPalmDate(ModificationDate));
+  WriteU32(Stream, DateTimeToPalmDate(LastBackupDate));
+  WriteU32(Stream, ModificationNumber);
+  WriteU32(Stream, AppInfoID);
+  WriteU32(Stream, SortInfoID);
+  WriteFixedString(Stream, DBType, 4);
+  WriteFixedString(Stream, Creator, 4);
+  WriteU32(Stream, UniqueIDSeed);
+
+  { ----- Record list header ----- }
+  WriteU32(Stream, 0);              // nextRecordListID
+  WriteU16(Stream, NumRecords);
+
+  { ----- Record list entries ----- }
+  for I := 0 to NumRecords - 1 do
+  begin
+    WriteU32(Stream, RecOffsets[I]);
+    Attr := FRecords[I].Attributes;
+    UID  := FRecords[I].UniqueID;
+    WriteU8(Stream, Attr);
+    WriteU8(Stream, (UID shr 16) and $FF);
+    WriteU8(Stream, (UID shr 8) and $FF);
+    WriteU8(Stream, UID and $FF);
+  end;
+
+  { ----- Gap ----- }
+  WriteU16(Stream, 0);
+
+  { ----- AppInfo / SortInfo ----- }
+  if Length(AppInfoBlock) > 0 then
+    Stream.WriteBuffer(AppInfoBlock[0], Length(AppInfoBlock));
+  if Length(SortInfoBlock) > 0 then
+    Stream.WriteBuffer(SortInfoBlock[0], Length(SortInfoBlock));
+
+  { ----- Record data ----- }
+  for I := 0 to NumRecords - 1 do
+    if Length(FRecords[I].Data) > 0 then
+      Stream.WriteBuffer(FRecords[I].Data[0], Length(FRecords[I].Data));
+end;
+
+procedure TPDBFile.SaveToFile(const AFileName: string);
+var
+  Stream: TFileStream;
+begin
+  Stream := TFileStream.Create(AFileName, fmCreate);
+  try
+    SaveToStream(Stream);
+  finally
+    Stream.Free;
+  end;
+end;
+
+{ ---- Convenience ---- }
+
+function DecodePDBFile(const AFileName: string): TPDBFile;
+begin
+  Result := TPDBFile.Create;
+  try
+    Result.LoadFromFile(AFileName);
+  except
+    Result.Free;
+    raise;
+  end;
+end;
+
+end.

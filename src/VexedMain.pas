@@ -30,6 +30,9 @@ type
     Map: TArray<TArray<Integer>>;
     Tiles: TArray<TBitmap>;
     procedure DumpDisplayInfo;
+    procedure DumpPDB(const AFile: String);
+    procedure DebugAdd(const S: String); overload;
+    procedure DebugAdd(const FormatString: string; const Args: array of const); overload;
   public
     { Public declarations }
   end;
@@ -45,16 +48,52 @@ uses
 {$IF DEFINED(MSWINDOWS)}
   DisplayData,
 {$IFEND}
+  PalmPDB,
   Gorilla.DefTypes, System.Math,
   TileMapRenderer,
   FMX.Types3D;
 
 {$R *.fmx}
 
+procedure TForm1.DumpPDB(const AFile: String);
+var
+  PDB: TPDBFile;
+  I: Integer;
+begin
+  try
+    PDB := DecodePDBFile(AFile);
+    try
+      DebugAdd('Name         : %s', [PDB.Name]);
+      DebugAdd('Type/Creator : %S / %S', [PDB.DBType, PDB.Creator]);
+      DebugAdd('Version      : %d', [PDB.Version]);
+      DebugAdd('Created      : %s', [DateTimeToStr(PDB.CreationDate)]);
+      DebugAdd('Modified     : %s', [DateTimeToStr(PDB.ModificationDate)]);
+      DebugAdd('Resource DB  : %s', [BoolToStr(PDB.IsResourceDatabase, True)]);
+      DebugAdd('Records      : %d', [PDB.RecordCount]);
+      DebugAdd('');
+
+      for I := 0 to PDB.RecordCount - 1 do
+        DebugAdd('  #%d  UID=%d  %d bytes  deleted=%s',
+          [I,
+           PDB.Records[I].UniqueID,
+           Length(PDB.Records[I].Data),
+           BoolToStr(PDB.Records[I].IsDeleted, True)]);
+    finally
+      PDB.Free;
+    end;
+  except
+    on E: Exception do
+      DebugAdd('Error: ', [E.Message]);
+  end;
+
+end;
+
 procedure TForm1.FormCreate(Sender: TObject);
 begin
   TabControl1.ActiveTab := GorillaTab;
 
+  // Mac and Linux paths are provisional holding places
+  // Need proper paths investigating and setting for deployment
   {$IF DEFINED(MACOS)}
   AssetsDir := IncludeTrailingPathDelimiter(TPath.GetLibraryPath);
   {$ELSEIF DEFINED(LINUX)}
@@ -84,6 +123,16 @@ begin
   for I := 0 to Length(Tiles) - 1 do
     Tiles[I].Free;
   SetLength(Tiles, 0);
+end;
+
+procedure TForm1.DebugAdd(const S: String);
+begin
+  Memo1.Lines.Add(S);
+end;
+
+procedure TForm1.DebugAdd(const FormatString: string; const Args: array of const);
+begin
+  Memo1.Lines.Add(Format(FormatString, Args));
 end;
 
 procedure TForm1.DumpDisplayInfo;
@@ -139,6 +188,7 @@ begin
 {$IF DEFINED(MSWINDOWS)}
   DumpDisplayInfo;
 {$IFEND}
+  DumpPDB(AssetsDir + 'levels/Classic Levels.pdb');
   SetLength(Map, 4, 3);          // 4 columns x 3 rows
   Map[0] := [0, 1, 0];
   Map[1] := [1, 1, 1];
