@@ -9,7 +9,7 @@ uses
   Gorilla.Model, FMX.Controls3D, Gorilla.Light, Gorilla.Viewport,
   FMX.TabControl, FMX.Layouts, Gorilla.Controller, Gorilla.Animation.Controller,
   FMX.Memo.Types, FMX.Controls.Presentation, FMX.ScrollBox, FMX.Memo,
-  FMX.StdCtrls, FMX.Objects3D, Gorilla.Camera;
+  FMX.StdCtrls, FMX.Objects3D, Gorilla.Camera, FMX.Viewport3D;
 
 type
   TControl3DAccess = class(TControl3D);
@@ -19,14 +19,17 @@ type
     TabItem1: TTabItem;
     Memo1: TMemo;
     Layout1: TLayout;
-    ViewportLayout: TLayout;
+    GorillaViewport1: TGorillaViewport;
+    GorillaCamera1: TGorillaCamera;
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
+    procedure FormDestroy(Sender: TObject);
   private
     { Private declarations }
     AssetsDir: String;
+    Map: TArray<TArray<Integer>>;
+    Tiles: TArray<TBitmap>;
     procedure DumpDisplayInfo;
-    procedure SwitchModel(const AModel: String);
   public
     { Public declarations }
   end;
@@ -43,6 +46,7 @@ uses
   DisplayData,
 {$IFEND}
   Gorilla.DefTypes, System.Math,
+  TileMapRenderer,
   FMX.Types3D;
 
 {$R *.fmx}
@@ -56,15 +60,31 @@ begin
   {$ELSEIF DEFINED(LINUX)}
   AssetsDir := IncludeTrailingPathDelimiter(TPath.GetHomePath);
   {$ELSE}
-  AssetsDir := '../../../';
+  AssetsDir := '../../';
   {$ENDIF}
 
   {$IF DEFINED(MSWINDOWS)}
   if DirectoryExists('images') then
     AssetsDir := String.Empty;
   {$IFEND}
+  GorillaCamera1.Parent := GorillaViewport1;
+  GorillaCamera1.ProjectionMode := cpOrthographic;
+  GorillaCamera1.OrthoHeight := ClientHeight;
+  GorillaViewport1.Camera := GorillaCamera1;
+  GorillaViewport1.UsingDesignCamera := False;
+
 end;
 
+
+procedure TForm1.FormDestroy(Sender: TObject);
+var
+  I: Integer;
+begin
+  SetLength(Map, 0, 0);
+  for I := 0 to Length(Tiles) - 1 do
+    Tiles[I].Free;
+  SetLength(Tiles, 0);
+end;
 
 procedure TForm1.DumpDisplayInfo;
 {$IF DEFINED(MSWINDOWS)}
@@ -113,14 +133,23 @@ begin
 {$IFEND}
 end;
 
-// On startup load a default Model as specified by DefaultLoadType
-// The directory layout of models/Orientation follows this pattern
-// to allow easy addition of new Model types
+
 procedure TForm1.FormShow(Sender: TObject);
 begin
 {$IF DEFINED(MSWINDOWS)}
   DumpDisplayInfo;
 {$IFEND}
+  SetLength(Map, 4, 3);          // 4 columns x 3 rows
+  Map[0] := [0, 1, 0];
+  Map[1] := [1, 1, 1];
+  Map[2] := [0, -1, 0];          // -1 = empty cell, skipped
+  Map[3] := [1, 0, 1];
+
+  SetLength(Tiles, 2);
+  Tiles[0] := TBitmap.CreateFromFile(AssetsDir + 'images/chinese/tile1.png');
+  Tiles[1] := TBitmap.CreateFromFile(AssetsDir + 'images/chinese/tile2.png');
+
+  RenderTileMap(GorillaViewport1, Map, Tiles, 128);
 
 end;
 

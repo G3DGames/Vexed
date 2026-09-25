@@ -8,6 +8,7 @@ object Form1: TForm1
   FormFactor.Height = 480
   FormFactor.Devices = [Desktop]
   OnCreate = FormCreate
+  OnDestroy = FormDestroy
   OnShow = FormShow
   DesignerMasterStyle = 0
   object TabControl1: TTabControl
@@ -42,12 +43,59 @@ object Form1: TForm1
         Size.Height = 500.000000000000000000
         Size.PlatformDefault = False
         TabOrder = 0
-        object ViewportLayout: TLayout
+        object GorillaViewport1: TGorillaViewport
+          RendererType = ForwardRenderer
+          ManualRendering = False
+          UseFixedFrameRate = True
+          FixedFrameRate = 60
+          FrustumCulling = True
+          HighRes = False
+          VSync = False
+          NearPlane = 0.100000001490116100
+          FarPlane = 10000.000000000000000000
+          Fog = False
+          FogKind = fkLinear
+          FogDensity = 0.001000000047497451
+          FogStart = 100.000000000000000000
+          FogEnd = 500.000000000000000000
+          FogColor = claBlack
+          TranslucentSaturation = 1.500000000000000000
+          EmissiveBlur = 0
+          Shadows.CascadeSplitLambda = 0.750000000000000000
+          Shadows.Strength = 1.000000000000000000
+          Shadows.Bias = 0.000500000023748726
+          Shadows.SlopeBias = 0.001000000047497451
+          Shadows.NormalOffset = 0.019999999552965160
+          GlobalIllumDetail = 0
+          GlobalIllumSoftness = 1.000000000000000000
+          ShadowStrength = 0.400000005960464500
+          FXAA = 0
+          SSS_Enabled = False
+          SSS_NumSamples = 128
+          SSS_SampleStep = 0.050000000745058060
+          SSS_ShadowStrength = 2.000000000000000000
+          SSAO_Enabled = False
+          SSAO_Radius = 1.000000000000000000
+          SSAO_Bias = 0.500000000000000000
+          DiagnosticsActive = False
+          RendererOutputLayer = OutputAll
           Align = Client
+          Color = claBlack
           Size.Width = 672.000000000000000000
           Size.Height = 500.000000000000000000
           Size.PlatformDefault = False
-          TabOrder = 0
+        end
+        object GorillaCamera1: TGorillaCamera
+          AngleOfView = 45.000000000000000000
+          Position.Z = -5.000000000000000000
+          Width = 1.000000000000000000
+          Height = 1.000000000000000000
+          Depth = 1.000000000000000000
+          FOV = 45.000000000000000000
+          ProjectionMode = cpOrthographic
+          OrthoHeight = 10.000000000000000000
+          IsometricYaw = 45.000000000000000000
+          IsometricPitch = 35.264389038085940000
         end
       end
     end

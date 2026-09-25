@@ -346,6 +346,7 @@
         </DCCReference>
         <DCCReference Include="common\DisplayData.pas"/>
         <DCCReference Include="common\GpuPreference.pas"/>
+        <DCCReference Include="src\TileMapRenderer.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

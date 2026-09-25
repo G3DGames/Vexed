@@ -5,7 +5,8 @@ uses
   FMX.Forms,
   VexedMain in 'src\VexedMain.pas' {Form1},
   DisplayData in 'common\DisplayData.pas',
-  GpuPreference in 'common\GpuPreference.pas';
+  GpuPreference in 'common\GpuPreference.pas',
+  TileMapRenderer in 'src\TileMapRenderer.pas';
 
 {$R *.res}
 
