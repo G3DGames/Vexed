@@ -4,12 +4,12 @@
         <ProjectVersion>20.5</ProjectVersion>
         <FrameworkType>FMX</FrameworkType>
         <Base>True</Base>
-        <Config Condition="'$(Config)'==''">Debug</Config>
+        <Config Condition="'$(Config)'==''">Release</Config>
         <Platform Condition="'$(Platform)'==''">Win32</Platform>
-        <ProjectName Condition="'$(ProjectName)'==''">Vexed</ProjectName>
         <TargetedPlatforms>2790547</TargetedPlatforms>
         <AppType>Application</AppType>
         <MainSource>Vexed.dpr</MainSource>
+        <ProjectName Condition="'$(ProjectName)'==''">Vexed</ProjectName>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Config)'=='Base' or '$(Base)'!=''">
         <Base>true</Base>
@@ -345,7 +345,6 @@
             <FormType>fmx</FormType>
         </DCCReference>
         <DCCReference Include="common\DisplayData.pas"/>
-        <DCCReference Include="common\GpuPreference.pas"/>
         <DCCReference Include="src\TileMapRenderer.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
