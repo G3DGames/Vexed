@@ -2,6 +2,8 @@ unit VexedMain;
 
 interface
 
+{$DEFINE SINGLETEST}
+
 uses
   System.SysUtils, System.Types, System.UITypes, System.Classes, System.Variants,
   FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs,
@@ -27,6 +29,7 @@ type
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
+    procedure FormResize(Sender: TObject);
   private
     { Private declarations }
     AssetsDir: String;
@@ -34,6 +37,7 @@ type
     PDB: TPDBFile;
     Tiles: TArray<TBitmap>;
     Board: TVexedBoard;
+    Theme: String;
     procedure DumpDisplayInfo;
     procedure DumpPDB(const AFile: String);
     procedure DebugAdd(const S: String); overload;
@@ -55,6 +59,7 @@ uses
 {$IFEND}
   Gorilla.DefTypes, System.Math,
   TileMapRenderer,
+  System.Diagnostics,
   FMX.Types3D;
 
 {$R *.fmx}
@@ -98,6 +103,9 @@ begin
 
             for I := 0 to V.LevelCount -1 do
               begin
+                {$IF DEFINED(SINGLETEST)}
+                if I = 32 then
+                {$IFEND}
                 Board := DecodeVexedBoard(V.Level[I].Board);
                 DebugAdd('Title : %s',[V.Level[I].Title]);
                 DebugAdd('Board : %s',[V.Level[I].Board]);
@@ -120,8 +128,9 @@ end;
 
 procedure TForm1.FormCreate(Sender: TObject);
 begin
-  TabControl1.ActiveTab := GorillaTab;
+  Theme := 'classic';
 
+  TabControl1.ActiveTab := GorillaTab;
   // Mac and Linux paths are provisional holding places
   // Need proper paths investigating and setting for deployment
   {$IF DEFINED(MACOS)}
@@ -138,7 +147,9 @@ begin
   {$IFEND}
   GorillaCamera1.Parent := GorillaViewport1;
   GorillaCamera1.ProjectionMode := cpOrthographic;
-  GorillaCamera1.OrthoHeight := ClientHeight;
+  GorillaCamera1.OrthoHeight := 1024;
+  GorillaCamera1.Position.X := 640 - 64;
+  GorillaCamera1.Position.Y := 512 - 64;
   GorillaViewport1.Camera := GorillaCamera1;
   GorillaViewport1.UsingDesignCamera := False;
 
@@ -156,6 +167,11 @@ begin
   for I := 0 to Length(Tiles) - 1 do
     Tiles[I].Free;
   SetLength(Tiles, 0);
+end;
+
+procedure TForm1.FormResize(Sender: TObject);
+begin
+  Caption := Format('Width : %f, Height : %f',[GorillaViewport1.Width, GorillaViewport1.Height]);
 end;
 
 procedure TForm1.DebugAdd(const S: String);
@@ -218,14 +234,32 @@ end;
 
 procedure TForm1.FormShow(Sender: TObject);
 var
-  I: Integer;
+  I, T: Integer;
+  S : TStopwatch;
 begin
   DumpDisplayInfo;
-  // DumpPDB(AssetsDir + 'levels/Classic II Levels.pdb');
-
+  T := 0;
+  S := TStopwatch.Create;
+  S.Start;
+  {$IF DEFINED(SINGLETEST)}
+  DumpPDB(AssetsDir + 'levels/Classic Levels.pdb');
+  Inc(T);
+  {$ELSE}
   // Test all packs
   for I := 0 to Length(VexedPacks) - 1 do
-    DumpPDB(AssetsDir + 'levels/' + VexedPacks[I] + '.pdb');
+    begin
+      DumpPDB(AssetsDir + 'levels/' + VexedPacks[I] + '.pdb');
+      Inc(T);
+    end;
+  {$ENDIF}
+  DebugAdd('');
+  DebugAdd('Timing');
+  DebugAdd('======');
+  DebugAdd('');
+
+  DebugAdd('Decode Time * %d = %d ms', [T, S.ElapsedMilliseconds]);
+  DebugAdd('Avg. Time per Pack = %0.3f ms', [Single(S.ElapsedMilliseconds / T)]);
+  S.Stop;
 
   SetLength(Map, 4, 3);          // 4 columns x 3 rows
   Map[0] := [0, 1, 0];
@@ -233,11 +267,23 @@ begin
   Map[2] := [0, -1, 0];          // -1 = empty cell, skipped
   Map[3] := [1, 0, 1];
 
-  SetLength(Tiles, 2);
-  Tiles[0] := TBitmap.CreateFromFile(AssetsDir + 'images/chinese/tile1.png');
-  Tiles[1] := TBitmap.CreateFromFile(AssetsDir + 'images/chinese/tile2.png');
+  SetLength(Tiles, 10);
+  Tiles[0] := TBitmap.CreateFromFile(AssetsDir + 'images/blank.png');
+  Tiles[1] := TBitmap.CreateFromFile(AssetsDir + 'images/' + Theme + '/tile1.png');
+  Tiles[2] := TBitmap.CreateFromFile(AssetsDir + 'images/' + Theme + '/tile2.png');
+  Tiles[3] := TBitmap.CreateFromFile(AssetsDir + 'images/' + Theme + '/tile3.png');
+  Tiles[4] := TBitmap.CreateFromFile(AssetsDir + 'images/' + Theme + '/tile4.png');
+  Tiles[5] := TBitmap.CreateFromFile(AssetsDir + 'images/' + Theme + '/tile5.png');
+  Tiles[6] := TBitmap.CreateFromFile(AssetsDir + 'images/' + Theme + '/tile6.png');
+  Tiles[7] := TBitmap.CreateFromFile(AssetsDir + 'images/' + Theme + '/tile7.png');
+  Tiles[8] := TBitmap.CreateFromFile(AssetsDir + 'images/' + Theme + '/tile8.png');
+  Tiles[9] := TBitmap.CreateFromFile(AssetsDir + 'images/wall.png');
 
+  {$IF DEFINED(SINGLETEST)}
+  RenderTileMap(GorillaViewport1, Board, Tiles);
+  {$ELSE}
   RenderTileMap(GorillaViewport1, Map, Tiles, 128);
+  {$IFEND}
 
 end;
 
