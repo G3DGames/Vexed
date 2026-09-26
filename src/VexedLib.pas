@@ -9,6 +9,16 @@ const
   VexedBoardMaxRow  =  7;
   VexedBoardMaxCol  =  9;
 
+  VexedPacks : Array [0..47] of String = (
+			'Children''s Pack',	'Classic Levels',	'Classic II Levels',	'Confusion Pack',	'Impossible Pack',	'Panic Pack',
+			'Twister Levels',	'Variety II Pack',	'Variety Pack',			'Variety 3 Pack',	'Variety 4 Pack',	'Variety 5 Pack',
+			'Variety 6 Pack',	'Variety 7 Pack',	'Variety 8 Pack',		'Variety 9 Pack',	'Variety 10 Pack',	'Variety 11 Pack',
+			'Variety 12 Pack',	'Variety 13 Pack',	'Variety 14 Pack',		'Variety 15 Pack',	'Variety 16 Pack',	'Variety 17 Pack',
+			'Variety 18 Pack',	'Variety 19 Pack',	'Variety 20 Pack',		'Variety 21 Pack',	'Variety 22 Pack',	'Variety 23 Pack',
+			'Variety 24 Pack',	'Variety 25 Pack',	'Variety 26 Pack',		'Variety 27 Pack',	'Variety 28 Pack',	'Variety 29 Pack',
+			'Variety 30 Pack',	'Variety 31 Pack',	'Variety 32 Pack',		'Variety 33 Pack',	'Variety 34 Pack',	'Variety 35 Pack',
+			'Variety 36 Pack',	'Variety 37 Pack',	'Variety 38 Pack',		'Variety 39 Pack',	'Variety 40 Pack',	'Variety 41 Pack');
+
 type
   TVexedBoard = Array [0..VexedBoardMaxRow, 0..VexedBoardMaxCol] of Integer;
 

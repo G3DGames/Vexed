@@ -658,7 +658,8 @@ var
   LastRec: Boolean;
   EOL: Byte;
 begin
-  var dbg: Integer := 0;
+  LInfo := Nil;
+  LLevel := Nil;
 
   if not Assigned(Data) then
     begin
@@ -692,14 +693,14 @@ begin
       RunLength := RunLength - (Length(Section) + 1);
 
       LInfo := TVexedInfo.Create;
-      while(RunLength > 0) do
+      while(RunLength > 1) do
         begin
           // Read the Key
           Key := Buf.ReadString;
           // Update RunLength. subtract chars in Key + 1 (terminating null)
           RunLength := RunLength - (Length(Key) + 1);
           if RunLength <= 0 then
-            Raise EVexedError.Create('Read Error');
+            Raise EVexedError.Create('Read Error (Description)');
           // Read the Key
           Value := Buf.ReadString;
           // Update RunLength. subtract chars in Value + 1 (terminating null)
@@ -708,13 +709,23 @@ begin
             LInfo.SetAuthor(Value)
           else if Key = 'Description' then
             LInfo.SetDescription(Value)
+          // Hack to fix typo in Variety Pack 13+
+          else if Key = 'Descrption' then
+            LInfo.SetDescription(Value)
           else if Key = 'URL' then
             LInfo.SetUrl(Value)
           else
             Raise EVexedError.Create('Unhandled Info Key/Value');
         end;
+
+        // Potential Padding
+        if (RunLength > 0) then
+          begin
+            EOL := Buf.ReadByte;
+            RunLength := RunLength - SizeOf(Byte);
+          end;
+
         FVexed.AddInfo(LInfo);
-        LInfo.Free;
 
       if Buf.FPosition < Buf.FSize then
         begin
@@ -753,7 +764,7 @@ begin
                   // Update RunLength. subtract chars in Key + 1 (terminating null)
                   RunLength := RunLength - (Length(Key) + 1);
                   if RunLength <= 0 then
-                    Raise EVexedError.Create('Read Error');
+                    Raise EVexedError.Create('Read Error (Level)');
                   // Read the Key
                   Value := Buf.ReadString;
                   // Update RunLength. subtract chars in Value + 1 (terminating null)
@@ -768,19 +779,15 @@ begin
                     Raise EVexedError.Create('Unhandled Level Key/Value');
                 end;
 
+              // Potential Padding Byte
               if (RunLength > 0) then
                 begin
-                  EOL := Buf.ReadByte; // sbdbg
+                  EOL := Buf.ReadByte;
                   RunLength := RunLength - SizeOf(Byte);
                 end;
 
 
               FVexed.AddLevel(LLevel);
-              Inc(dbg);
-              if dbg = 58 then
-                LastRec := False;
-
-              // LLevel.Free;
 
             end;
         end;
@@ -791,6 +798,7 @@ begin
     end;
 
   finally
+    LInfo.Free;
     Buf.Free;
   end;
 

@@ -64,6 +64,7 @@ var
   I: Integer;
   V: TVexedPack;
 begin
+  DebugAdd('File : %s', [AFile]);
   try
     if Assigned(PDB) then
       FreeAndNil(PDB);
@@ -88,21 +89,27 @@ begin
         DebugAdd('');
 
         V := PDB.Records[0].Vexed;
-        DebugAdd('Author : %s', [V.Info.Author]);
-        DebugAdd('URL : %s', [V.Info.Url]);
-        DebugAdd('Desc : %s', [V.Info.Description]);
-        DebugAdd('');
-
-        for I := 0 to V.LevelCount -1 do
+        if(V <> Nil) then
           begin
-            Board := DecodeVexedBoard(V.Level[I].Board);
-            DebugAdd('Title : %s',[V.Level[I].Title]);
-            DebugAdd('Board : %s',[V.Level[I].Board]);
-            DebugAdd('Solve : %s',[V.Level[I].Solution]);
+            DebugAdd('Author : %s', [V.Info.Author]);
+            DebugAdd('URL : %s', [V.Info.Url]);
+            DebugAdd('Desc : %s', [V.Info.Description]);
             DebugAdd('');
-          end;
+
+            for I := 0 to V.LevelCount -1 do
+              begin
+                Board := DecodeVexedBoard(V.Level[I].Board);
+                DebugAdd('Title : %s',[V.Level[I].Title]);
+                DebugAdd('Board : %s',[V.Level[I].Board]);
+                DebugAdd('Solve : %s',[V.Level[I].Solution]);
+                DebugAdd('');
+              end;
+          end
+        else
+          DebugAdd('******** Decode Error ********');
+        DebugAdd('');
     finally
-//      PDB.Free;
+      // V.Free;
     end;
   except
     on E: Exception do
@@ -210,9 +217,16 @@ end;
 
 
 procedure TForm1.FormShow(Sender: TObject);
+var
+  I: Integer;
 begin
   DumpDisplayInfo;
-  DumpPDB(AssetsDir + 'levels/Classic Levels.pdb');
+  // DumpPDB(AssetsDir + 'levels/Classic II Levels.pdb');
+
+  // Test all packs
+  for I := 0 to Length(VexedPacks) - 1 do
+    DumpPDB(AssetsDir + 'levels/' + VexedPacks[I] + '.pdb');
+
   SetLength(Map, 4, 3);          // 4 columns x 3 rows
   Map[0] := [0, 1, 0];
   Map[1] := [1, 1, 1];
