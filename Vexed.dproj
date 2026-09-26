@@ -347,6 +347,8 @@
         <DCCReference Include="common\DisplayData.pas"/>
         <DCCReference Include="src\TileMapRenderer.pas"/>
         <DCCReference Include="src\PalmPDB.pas"/>
+        <DCCReference Include="src\VexedLib.pas"/>
+        <DCCReference Include="common\GpuPreference.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

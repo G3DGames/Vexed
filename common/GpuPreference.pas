@@ -19,9 +19,11 @@ function GetGpuPreference(out APreference: TGpuPreference;
 implementation
 
 uses
-  System.SysUtils,
+  {$if defined(MSWINDOWS)}
   System.Win.Registry,
-  Winapi.Windows;
+  Winapi.Windows,
+  {$ifend}
+  System.SysUtils;
 
 const
   GPU_PREF_KEY =

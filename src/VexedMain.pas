@@ -10,6 +10,7 @@ uses
   FMX.TabControl, FMX.Layouts, Gorilla.Controller, Gorilla.Animation.Controller,
   FMX.Memo.Types, FMX.Controls.Presentation, FMX.ScrollBox, FMX.Memo,
   FMX.StdCtrls, FMX.Objects3D, Gorilla.Camera, FMX.Viewport3D,
+  VexedLib,
   PalmPDB
   ;
 
@@ -32,6 +33,7 @@ type
     Map: TArray<TArray<Integer>>;
     PDB: TPDBFile;
     Tiles: TArray<TBitmap>;
+    Board: TVexedBoard;
     procedure DumpDisplayInfo;
     procedure DumpPDB(const AFile: String);
     procedure DebugAdd(const S: String); overload;
@@ -93,12 +95,12 @@ begin
 
         for I := 0 to V.LevelCount -1 do
           begin
+            Board := DecodeVexedBoard(V.Level[I].Board);
             DebugAdd('Title : %s',[V.Level[I].Title]);
             DebugAdd('Board : %s',[V.Level[I].Board]);
             DebugAdd('Solve : %s',[V.Level[I].Solution]);
             DebugAdd('');
           end;
-
     finally
 //      PDB.Free;
     end;
