@@ -6,6 +6,55 @@ uses
   System.SysUtils, System.Classes, System.Generics.Collections;
 
 type
+  EByteBufferError = class(Exception);
+
+  TByteBuffer = class
+  private
+    FBuffer: TBytes;
+    FPosition: Integer; // read/write cursor
+    FSize: Integer;     // logical length of valid data
+    procedure EnsureCapacity(ARequired: Integer);
+    procedure CheckReadable(ACount: Integer);
+    function ReadWordAt(APos: Integer): Word;
+    function ReadStringAt(APos: Integer; out ANextPos: Integer): string;
+    function ReadFixedStringAt(APos, ASlotSize: Integer): string;
+  public
+    constructor Create; overload;
+    constructor Create(const AData: TBytes); overload;
+
+    // --- Reading (advances cursor) ---
+    function ReadWord: Word;
+    function ReadString: string;
+
+    // --- Peeking (does not advance cursor) ---
+    function PeekWord: Word;
+    function PeekString: string;
+
+    // --- Writing (extends buffer, advances cursor) ---
+    procedure WriteWord(AValue: Word);
+    procedure WriteString(const AValue: string);
+
+    // --- Overwrite-in-place (does not extend FSize) ---
+    procedure OverwriteWord(AValue: Word);
+    procedure OverwriteString(const AValue: string);
+
+    // --- Navigation / state ---
+    procedure Seek(APosition: Integer);
+    function Eof: Boolean;
+
+    // --- Fixed-width string slots ---
+    function ReadFixedString(ASlotSize: Integer): string;
+    function PeekFixedString(ASlotSize: Integer): string;
+    procedure WriteFixedString(const AValue: string; ASlotSize: Integer);
+    procedure OverwriteFixedString(const AValue: string; ASlotSize: Integer);
+
+    // --- Access ---
+    function ToBytes: TBytes;
+
+    property Position: Integer read FPosition;
+    property Size: Integer read FSize;
+  end;
+
   TVexedInfo = class // Marked by General, followed by KV stream
   strict private
     FAuthor: String;
@@ -25,18 +74,26 @@ type
   strict private
     FInfo: TVexedInfo;
     FLevels: TObjectList<TVexedLevel>;
+  public
+    constructor Create;
+    destructor Destroy; override;
   end;
 
   TPDBRecord = class
+  strict private
+    FVexed: TVexedPack;
   public
     Attributes: Byte;      // Record attribute flags (high nibble) + category (low)
     UniqueID: Cardinal;    // 3-byte unique record ID (0..$FFFFFF)
     Data: TBytes;          // Raw record payload
+    constructor Create;
+    destructor Destroy; override;
     function IsDeleted: Boolean;
     function IsDirty: Boolean;
     function IsBusy: Boolean;
     function IsSecret: Boolean;
-    function DecodeVexedData: TVexedPack;
+    procedure DecodeVexedData;
+    property Vexed: TVexedPack read FVexed write FVexed;
   end;
 
   TPDBFile = class
@@ -93,6 +150,311 @@ const
   PDB_HEADER_SIZE   = 78; // fixed header up to record-list header
   RECLIST_HDR_SIZE  = 6;  // nextRecordListID(4) + numRecords(2)
   RECLIST_ENTRY_SIZE = 8; // offset(4) + attr(1) + uniqueID(3)
+  GROW_MIN = 64;
+
+{ TByteBuffer }
+
+constructor TByteBuffer.Create;
+begin
+  inherited Create;
+  SetLength(FBuffer, 0);
+  FPosition := 0;
+  FSize := 0;
+end;
+
+constructor TByteBuffer.Create(const AData: TBytes);
+begin
+  inherited Create;
+  FBuffer := Copy(AData, 0, Length(AData));
+  FPosition := 0;
+  FSize := Length(FBuffer);
+end;
+
+procedure TByteBuffer.EnsureCapacity(ARequired: Integer);
+var
+  NewCap: Integer;
+begin
+  if ARequired <= Length(FBuffer) then
+    Exit;
+
+  NewCap := Length(FBuffer);
+  if NewCap < GROW_MIN then
+    NewCap := GROW_MIN;
+  while NewCap < ARequired do
+    NewCap := NewCap * 2;
+
+  SetLength(FBuffer, NewCap);
+end;
+
+procedure TByteBuffer.CheckReadable(ACount: Integer);
+begin
+  if ACount < 0 then
+    raise EByteBufferError.Create('Negative read count');
+  if FPosition + ACount > FSize then
+    raise EByteBufferError.CreateFmt(
+      'Read past end of buffer (pos=%d, need=%d, size=%d)',
+      [FPosition, ACount, FSize]);
+end;
+
+// --- Positional primitives (shared by read & peek) ---
+
+function TByteBuffer.ReadWordAt(APos: Integer): Word;
+begin
+  if (APos < 0) or (APos + SizeOf(Word) > FSize) then
+    raise EByteBufferError.CreateFmt(
+      'Read past end of buffer (pos=%d, need=%d, size=%d)',
+      [APos, SizeOf(Word), FSize]);
+  // Big-endian: high byte first.
+  Result := (Word(FBuffer[APos]) shl 8) or
+            Word(FBuffer[APos + 1]);
+end;
+
+function TByteBuffer.ReadStringAt(APos: Integer; out ANextPos: Integer): string;
+var
+  StartPos, Len: Integer;
+  Raw: TBytes;
+begin
+  if (APos < 0) or (APos > FSize) then
+    raise EByteBufferError.CreateFmt(
+      'String start out of range (pos=%d, size=%d)', [APos, FSize]);
+
+  StartPos := APos;
+  while (APos < FSize) and (FBuffer[APos] <> 0) do
+    Inc(APos);
+
+  if APos >= FSize then
+    raise EByteBufferError.Create(
+      'Unterminated string: null terminator not found before end of buffer');
+
+  Len := APos - StartPos;
+  SetLength(Raw, Len);
+  if Len > 0 then
+    Move(FBuffer[StartPos], Raw[0], Len);
+
+  ANextPos := APos + 1; // consume terminator
+  Result := TEncoding.ANSI.GetString(Raw);
+end;
+
+// --- Reading (advances cursor) ---
+
+function TByteBuffer.ReadWord: Word;
+begin
+  Result := ReadWordAt(FPosition);
+  Inc(FPosition, SizeOf(Word));
+end;
+
+function TByteBuffer.ReadString: string;
+var
+  NextPos: Integer;
+begin
+  Result := ReadStringAt(FPosition, NextPos);
+  FPosition := NextPos;
+end;
+
+// --- Peeking (does not advance cursor) ---
+
+function TByteBuffer.PeekWord: Word;
+begin
+  Result := ReadWordAt(FPosition);
+end;
+
+function TByteBuffer.PeekString: string;
+var
+  NextPos: Integer;
+begin
+  Result := ReadStringAt(FPosition, NextPos);
+end;
+
+// --- Writing (extends buffer, advances cursor) ---
+
+procedure TByteBuffer.WriteWord(AValue: Word);
+begin
+  EnsureCapacity(FPosition + SizeOf(Word));
+  // Big-endian: high byte first.
+  FBuffer[FPosition]     := Byte((AValue shr 8) and $FF);
+  FBuffer[FPosition + 1] := Byte(AValue and $FF);
+  Inc(FPosition, SizeOf(Word));
+  if FPosition > FSize then
+    FSize := FPosition;
+end;
+
+procedure TByteBuffer.WriteString(const AValue: string);
+var
+  Raw: TBytes;
+  Len: Integer;
+begin
+  Raw := TEncoding.ANSI.GetBytes(AValue);
+  Len := Length(Raw);
+
+  EnsureCapacity(FPosition + Len + 1);
+  if Len > 0 then
+    Move(Raw[0], FBuffer[FPosition], Len);
+  Inc(FPosition, Len);
+
+  FBuffer[FPosition] := 0; // C-style null terminator
+  Inc(FPosition);
+
+  if FPosition > FSize then
+    FSize := FPosition;
+end;
+
+// --- Overwrite-in-place (does not extend FSize) ---
+
+procedure TByteBuffer.OverwriteWord(AValue: Word);
+begin
+  if FPosition + SizeOf(Word) > FSize then
+    raise EByteBufferError.CreateFmt(
+      'Overwrite past end of valid data (pos=%d, need=%d, size=%d)',
+      [FPosition, SizeOf(Word), FSize]);
+
+  FBuffer[FPosition]     := Byte((AValue shr 8) and $FF);
+  FBuffer[FPosition + 1] := Byte(AValue and $FF);
+  Inc(FPosition, SizeOf(Word));
+end;
+
+procedure TByteBuffer.OverwriteString(const AValue: string);
+var
+  Raw: TBytes;
+  Len, Total: Integer;
+begin
+  Raw := TEncoding.ANSI.GetBytes(AValue);
+  Len := Length(Raw);
+  Total := Len + 1; // include null terminator
+
+  if FPosition + Total > FSize then
+    raise EByteBufferError.CreateFmt(
+      'Overwrite past end of valid data (pos=%d, need=%d, size=%d)',
+      [FPosition, Total, FSize]);
+
+  if Len > 0 then
+    Move(Raw[0], FBuffer[FPosition], Len);
+  Inc(FPosition, Len);
+
+  FBuffer[FPosition] := 0;
+  Inc(FPosition);
+end;
+
+// --- Navigation / state ---
+
+procedure TByteBuffer.Seek(APosition: Integer);
+begin
+  if (APosition < 0) or (APosition > FSize) then
+    raise EByteBufferError.CreateFmt(
+      'Seek out of range (pos=%d, size=%d)', [APosition, FSize]);
+  FPosition := APosition;
+end;
+
+function TByteBuffer.Eof: Boolean;
+begin
+  Result := FPosition >= FSize;
+end;
+
+// --- Access ---
+
+function TByteBuffer.ToBytes: TBytes;
+begin
+  Result := Copy(FBuffer, 0, FSize);
+end;
+
+// --- Fixed-width string slots ---
+
+function TByteBuffer.ReadFixedStringAt(APos, ASlotSize: Integer): string;
+var
+  Len: Integer;
+  Raw: TBytes;
+begin
+  if ASlotSize < 0 then
+    raise EByteBufferError.Create('Negative slot size');
+  if (APos < 0) or (APos + ASlotSize > FSize) then
+    raise EByteBufferError.CreateFmt(
+      'Read past end of buffer (pos=%d, need=%d, size=%d)',
+      [APos, ASlotSize, FSize]);
+
+  // The slot is fixed width; the logical string ends at the first null
+  // (or at the slot boundary if there is no null within the slot).
+  Len := 0;
+  while (Len < ASlotSize) and (FBuffer[APos + Len] <> 0) do
+    Inc(Len);
+
+  SetLength(Raw, Len);
+  if Len > 0 then
+    Move(FBuffer[APos], Raw[0], Len);
+
+  Result := TEncoding.ANSI.GetString(Raw);
+end;
+
+function TByteBuffer.ReadFixedString(ASlotSize: Integer): string;
+begin
+  Result := ReadFixedStringAt(FPosition, ASlotSize);
+  Inc(FPosition, ASlotSize); // always consume the whole slot
+end;
+
+function TByteBuffer.PeekFixedString(ASlotSize: Integer): string;
+begin
+  Result := ReadFixedStringAt(FPosition, ASlotSize);
+end;
+
+procedure TByteBuffer.WriteFixedString(const AValue: string; ASlotSize: Integer);
+var
+  Raw: TBytes;
+  Len: Integer;
+begin
+  if ASlotSize < 1 then
+    raise EByteBufferError.Create(
+      'Slot size must be at least 1 (room for a null terminator)');
+
+  Raw := TEncoding.ANSI.GetBytes(AValue);
+  Len := Length(Raw);
+
+  // Must fit the string AND at least one null terminator inside the slot.
+  if Len >= ASlotSize then
+    raise EByteBufferError.CreateFmt(
+      'String too long for slot (bytes=%d, slot=%d, need <=%d)',
+      [Len, ASlotSize, ASlotSize - 1]);
+
+  EnsureCapacity(FPosition + ASlotSize);
+
+  // Zero-fill the whole slot first so no stale bytes remain.
+  FillChar(FBuffer[FPosition], ASlotSize, 0);
+  if Len > 0 then
+    Move(Raw[0], FBuffer[FPosition], Len);
+
+  Inc(FPosition, ASlotSize);
+  if FPosition > FSize then
+    FSize := FPosition;
+end;
+
+procedure TByteBuffer.OverwriteFixedString(const AValue: string;
+  ASlotSize: Integer);
+var
+  Raw: TBytes;
+  Len: Integer;
+begin
+  if ASlotSize < 1 then
+    raise EByteBufferError.Create(
+      'Slot size must be at least 1 (room for a null terminator)');
+
+  Raw := TEncoding.ANSI.GetBytes(AValue);
+  Len := Length(Raw);
+
+  if Len >= ASlotSize then
+    raise EByteBufferError.CreateFmt(
+      'String too long for slot (bytes=%d, slot=%d, need <=%d)',
+      [Len, ASlotSize, ASlotSize - 1]);
+
+  // Overwrite must stay within existing valid data; never extend FSize.
+  if FPosition + ASlotSize > FSize then
+    raise EByteBufferError.CreateFmt(
+      'Overwrite past end of valid data (pos=%d, need=%d, size=%d)',
+      [FPosition, ASlotSize, FSize]);
+
+  // Zero-fill the entire slot to clear any previous, longer contents.
+  FillChar(FBuffer[FPosition], ASlotSize, 0);
+  if Len > 0 then
+    Move(Raw[0], FBuffer[FPosition], Len);
+
+  Inc(FPosition, ASlotSize);
+end;
 
 { ============================================================
   Endianness helpers.
@@ -240,9 +602,27 @@ end;
 function TPDBRecord.IsDeleted: Boolean; begin Result := (Attributes and $80) <> 0; end;
 function TPDBRecord.IsDirty: Boolean;   begin Result := (Attributes and $40) <> 0; end;
 
-function TPDBRecord.DecodeVexedData: TVexedPack;
+constructor TPDBRecord.Create;
+begin
+  inherited create;
+  FVexed := Nil;
+end;
+
+procedure TPDBRecord.DecodeVexedData;
 begin
   // Todo
+  if Assigned(FVexed) then
+    FreeAndNil(FVexed);
+
+  FVexed := TVexedPack.Create;
+end;
+
+destructor TPDBRecord.Destroy;
+begin
+  if Assigned(FVexed) then
+    FreeAndNil(FVexed);
+
+  inherited;
 end;
 
 function TPDBRecord.IsBusy: Boolean;    begin Result := (Attributes and $20) <> 0; end;
@@ -282,6 +662,7 @@ end;
 function TPDBFile.AddRecord: TPDBRecord;
 begin
   Result := TPDBRecord.Create;
+  Result.DecodeVexedData;
   FRecords.Add(Result);
 end;
 
@@ -393,6 +774,7 @@ begin
     begin
       Stream.Position := DataStart;
       Stream.ReadBuffer(Rec.Data[0], DataLen);
+      Rec.DecodeVexedData;
     end;
     FRecords.Add(Rec);
   end;
@@ -529,6 +911,25 @@ begin
     Result.Free;
     raise;
   end;
+end;
+
+{ TVexedPack }
+
+constructor TVexedPack.Create;
+begin
+  inherited Create;
+
+  FInfo := TVexedInfo.Create;
+  FLevels := TObjectList<TVexedLevel>.Create(True);
+
+end;
+
+destructor TVexedPack.Destroy;
+begin
+  FLevels.Free;
+  FInfo.Free;
+
+  inherited;
 end;
 
 end.

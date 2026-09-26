@@ -9,7 +9,9 @@ uses
   Gorilla.Model, FMX.Controls3D, Gorilla.Light, Gorilla.Viewport,
   FMX.TabControl, FMX.Layouts, Gorilla.Controller, Gorilla.Animation.Controller,
   FMX.Memo.Types, FMX.Controls.Presentation, FMX.ScrollBox, FMX.Memo,
-  FMX.StdCtrls, FMX.Objects3D, Gorilla.Camera, FMX.Viewport3D;
+  FMX.StdCtrls, FMX.Objects3D, Gorilla.Camera, FMX.Viewport3D,
+  PalmPDB
+  ;
 
 type
   TControl3DAccess = class(TControl3D);
@@ -28,6 +30,7 @@ type
     { Private declarations }
     AssetsDir: String;
     Map: TArray<TArray<Integer>>;
+    PDB: TPDBFile;
     Tiles: TArray<TBitmap>;
     procedure DumpDisplayInfo;
     procedure DumpPDB(const AFile: String);
@@ -45,10 +48,9 @@ implementation
 uses
   System.IOUtils,
   FMX.Platform,
-{$IF DEFINED(MSWINDOWS)}
+{$IF DEFINED(DMSWINDOWS)}
   DisplayData,
 {$IFEND}
-  PalmPDB,
   Gorilla.DefTypes, System.Math,
   TileMapRenderer,
   FMX.Types3D;
@@ -57,10 +59,11 @@ uses
 
 procedure TForm1.DumpPDB(const AFile: String);
 var
-  PDB: TPDBFile;
   I: Integer;
 begin
   try
+    if Assigned(PDB) then
+      FreeAndNil(PDB);
     PDB := DecodePDBFile(AFile);
     try
       DebugAdd('Name         : %s', [PDB.Name]);
@@ -79,7 +82,7 @@ begin
            Length(PDB.Records[I].Data),
            BoolToStr(PDB.Records[I].IsDeleted, True)]);
     finally
-      PDB.Free;
+//      PDB.Free;
     end;
   except
     on E: Exception do
@@ -119,6 +122,9 @@ procedure TForm1.FormDestroy(Sender: TObject);
 var
   I: Integer;
 begin
+  if Assigned(PDB) then
+    FreeAndNil(PDB);
+
   SetLength(Map, 0, 0);
   for I := 0 to Length(Tiles) - 1 do
     Tiles[I].Free;
@@ -136,7 +142,7 @@ begin
 end;
 
 procedure TForm1.DumpDisplayInfo;
-{$IF DEFINED(MSWINDOWS)}
+{$IF DEFINED(DMSWINDOWS)}
 var
   Displays: TPeardoxDisplays;
   Display: TDisplayInfo;
@@ -144,7 +150,7 @@ var
   I: Integer;
 {$IFEND}
 begin
-{$IF DEFINED(MSWINDOWS)}
+{$IF DEFINED(DMSWINDOWS)}
   Memo1.Lines.Clear;
 
   Displays := TPeardoxDisplays.Create;
@@ -185,9 +191,7 @@ end;
 
 procedure TForm1.FormShow(Sender: TObject);
 begin
-{$IF DEFINED(MSWINDOWS)}
   DumpDisplayInfo;
-{$IFEND}
   DumpPDB(AssetsDir + 'levels/Classic Levels.pdb');
   SetLength(Map, 4, 3);          // 4 columns x 3 rows
   Map[0] := [0, 1, 0];
