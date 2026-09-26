@@ -7,6 +7,7 @@ uses
 
 type
   EByteBufferError = class(Exception);
+  EVexedError = class(Exception);
 
   TByteBuffer = class
   private
@@ -15,6 +16,7 @@ type
     FSize: Integer;     // logical length of valid data
     procedure EnsureCapacity(ARequired: Integer);
     procedure CheckReadable(ACount: Integer);
+    function ReadByteAt(APos: Integer): Byte;
     function ReadWordAt(APos: Integer): Word;
     function ReadStringAt(APos: Integer; out ANextPos: Integer): string;
     function ReadFixedStringAt(APos, ASlotSize: Integer): string;
@@ -23,6 +25,7 @@ type
     constructor Create(const AData: TBytes); overload;
 
     // --- Reading (advances cursor) ---
+    function ReadByte: Byte;
     function ReadWord: Word;
     function ReadString: string;
 
@@ -60,6 +63,13 @@ type
     FAuthor: String;
     FUrl: String;
     FDescription: String;
+  public
+    procedure SetAuthor(const AValue: String);
+    procedure SetUrl(const AValue: String);
+    procedure SetDescription(const AValue: String);
+    property Author: String read FAuthor;
+    property Url: String read FUrl;
+    property Description: String read FDescription;
   end;
 
   TVexedLevel = class // Marked by Level, followed by KV stream
@@ -67,16 +77,29 @@ type
     FBoard: String;
     FSolution: String;
     FTitle: String;
-
+  public
+    procedure SetBoard(const AValue: String);
+    procedure SetSolution(const AValue: String);
+    procedure SetTitle(const AValue: String);
+    property Board: String read FBoard;
+    property Solution: String read FSolution;
+    property Title: String read FTitle;
   end;
 
   TVexedPack = class // A Vexed pack containing Info and multiple levels
   strict private
     FInfo: TVexedInfo;
     FLevels: TObjectList<TVexedLevel>;
+    function GetLevel(Index: Integer): TVexedLevel;
+    function GetLevelCount: Integer;
   public
     constructor Create;
     destructor Destroy; override;
+    procedure AddInfo(AValue: TVexedInfo);
+    procedure AddLevel(ALevel: TVexedLevel);
+    property Level[Index: Integer]: TVexedLevel read GetLevel; default;
+    property LevelCount: Integer read GetLevelCount;
+    property Info: TVexedInfo read FInfo;
   end;
 
   TPDBRecord = class
@@ -198,6 +221,16 @@ end;
 
 // --- Positional primitives (shared by read & peek) ---
 
+function TByteBuffer.ReadByteAt(APos: Integer): Byte;
+begin
+  if (APos < 0) or (APos + SizeOf(Byte) > FSize) then
+    raise EByteBufferError.CreateFmt(
+      'Read past end of buffer (pos=%d, need=%d, size=%d)',
+      [APos, SizeOf(Byte), FSize]);
+  // Big-endian: high byte first.
+  Result := Byte(FBuffer[APos]);
+end;
+
 function TByteBuffer.ReadWordAt(APos: Integer): Word;
 begin
   if (APos < 0) or (APos + SizeOf(Word) > FSize) then
@@ -236,6 +269,12 @@ begin
 end;
 
 // --- Reading (advances cursor) ---
+
+function TByteBuffer.ReadByte: Byte;
+begin
+  Result := ReadByteAt(FPosition);
+  Inc(FPosition, SizeOf(Byte));
+end;
 
 function TByteBuffer.ReadWord: Word;
 begin
@@ -609,12 +648,152 @@ begin
 end;
 
 procedure TPDBRecord.DecodeVexedData;
+var
+  Buf: TByteBuffer;
+  RunLength: Integer;
+  Marker: Word;
+  Section, Key, Value: String;
+  LInfo: TVexedInfo;
+  LLevel: TVexedLevel;
+  LastRec: Boolean;
+  EOL: Byte;
 begin
-  // Todo
+  var dbg: Integer := 0;
+
+  if not Assigned(Data) then
+    begin
+      if Assigned(FVexed) then
+        FreeAndNil(FVexed);
+      exit;
+    end;
+
   if Assigned(FVexed) then
     FreeAndNil(FVexed);
 
   FVexed := TVexedPack.Create;
+
+  Buf := TByteBuffer.Create(Data);
+  try
+    try
+      // Read Runlength
+      RunLength := Integer(Buf.ReadWord);
+      // Read Marker
+      Marker := Buf.ReadWord;
+      // It appears Marker is always 3
+      if Marker <> 3 then
+        Raise EVexedError.Create('Bad Marker');
+      // Update RunLength subtracting 2 Words just read
+      RunLength := RunLength - (2 * SizeOf(Word));
+      // Read the Section
+      Section := Buf.ReadString;
+      if Section <> 'General' then
+        Raise EVexedError.Create('Bad General Section Name');
+      // Update RunLength. subtract chars in Section + 1 (terminating null)
+      RunLength := RunLength - (Length(Section) + 1);
+
+      LInfo := TVexedInfo.Create;
+      while(RunLength > 0) do
+        begin
+          // Read the Key
+          Key := Buf.ReadString;
+          // Update RunLength. subtract chars in Key + 1 (terminating null)
+          RunLength := RunLength - (Length(Key) + 1);
+          if RunLength <= 0 then
+            Raise EVexedError.Create('Read Error');
+          // Read the Key
+          Value := Buf.ReadString;
+          // Update RunLength. subtract chars in Value + 1 (terminating null)
+          RunLength := RunLength - (Length(Value) + 1);
+          if Key = 'Author' then
+            LInfo.SetAuthor(Value)
+          else if Key = 'Description' then
+            LInfo.SetDescription(Value)
+          else if Key = 'URL' then
+            LInfo.SetUrl(Value)
+          else
+            Raise EVexedError.Create('Unhandled Info Key/Value');
+        end;
+        FVexed.AddInfo(LInfo);
+        LInfo.Free;
+
+      if Buf.FPosition < Buf.FSize then
+        begin
+          LastRec := False;
+
+          while not LastRec do
+            begin
+              // Read Runlength
+              RunLength := Integer(Buf.ReadWord);
+              // Runlength is zero on last record
+              if RunLength = 0 then
+                begin
+                  RunLength := Buf.FSize - Buf.FPosition;
+                  LastRec := True;
+                end;
+
+              // Read Marker
+              Marker := Buf.ReadWord;
+              // It appears Marker is always 3
+              if Marker <> 3 then
+                Raise EVexedError.Create('Bad Marker');
+              // Update RunLength subtracting 2 Words just read
+              RunLength := RunLength - (2 * SizeOf(Word));
+              // Read the Section
+              Section := Buf.ReadString;
+              if Section <> 'Level' then
+                Raise EVexedError.Create('Bad Level Section Name');
+              // Update RunLength. subtract chars in Section + 1 (terminating null)
+              RunLength := RunLength - (Length(Section) + 1);
+
+              LLevel := TVexedLevel.Create;
+              while(RunLength > 1) do
+                begin
+                  // Read the Key
+                  Key := Buf.ReadString;
+                  // Update RunLength. subtract chars in Key + 1 (terminating null)
+                  RunLength := RunLength - (Length(Key) + 1);
+                  if RunLength <= 0 then
+                    Raise EVexedError.Create('Read Error');
+                  // Read the Key
+                  Value := Buf.ReadString;
+                  // Update RunLength. subtract chars in Value + 1 (terminating null)
+                  RunLength := RunLength - (Length(Value) + 1);
+                  if Key = 'board' then
+                    LLevel.SetBoard(Value)
+                  else if Key = 'solution' then
+                    LLevel.SetSolution(Value)
+                  else if Key = 'title' then
+                    LLevel.SetTitle(Value)
+                  else
+                    Raise EVexedError.Create('Unhandled Level Key/Value');
+                end;
+
+              if (RunLength > 0) then
+                begin
+                  EOL := Buf.ReadByte; // sbdbg
+                  RunLength := RunLength - SizeOf(Byte);
+                end;
+
+
+              FVexed.AddLevel(LLevel);
+              Inc(dbg);
+              if dbg = 58 then
+                LastRec := False;
+
+              // LLevel.Free;
+
+            end;
+        end;
+
+
+    except
+      FreeAndNil(FVexed);
+    end;
+
+  finally
+    Buf.Free;
+  end;
+
 end;
 
 destructor TPDBRecord.Destroy;
@@ -915,6 +1094,18 @@ end;
 
 { TVexedPack }
 
+procedure TVexedPack.AddInfo(AValue: TVexedInfo);
+begin
+  Finfo.SetAuthor(AValue.Author);
+  Finfo.SetUrl(AValue.Url);
+  Finfo.SetDescription(AValue.Description);
+end;
+
+procedure TVexedPack.AddLevel(ALevel: TVexedLevel);
+begin
+  FLevels.Add(ALevel);
+end;
+
 constructor TVexedPack.Create;
 begin
   inherited Create;
@@ -930,6 +1121,56 @@ begin
   FInfo.Free;
 
   inherited;
+end;
+
+function TVexedPack.GetLevel(Index: Integer): TVexedLevel;
+begin
+  Result := FLevels[Index];
+end;
+
+function TVexedPack.GetLevelCount: Integer;
+begin
+  Result := FLevels.Count;
+end;
+
+{ TVexedInfo }
+
+procedure TVexedInfo.SetAuthor(const AValue: String);
+begin
+  if AValue <> FAuthor then
+    FAuthor := AValue;
+end;
+
+procedure TVexedInfo.SetDescription(const AValue: String);
+begin
+  if AValue <> FDescription then
+    FDescription := AValue;
+end;
+
+procedure TVexedInfo.SetUrl(const AValue: String);
+begin
+  if AValue <> FUrl then
+    FUrl := AValue;
+end;
+
+{ TVexedLevel }
+
+procedure TVexedLevel.SetBoard(const AValue: String);
+begin
+  if AValue <> FBoard then
+    FBoard := AValue;
+end;
+
+procedure TVexedLevel.SetSolution(const AValue: String);
+begin
+  if AValue <> FSolution then
+    FSolution := AValue;
+end;
+
+procedure TVexedLevel.SetTitle(const AValue: String);
+begin
+  if AValue <> FTitle then
+    FTitle := AValue;
 end;
 
 end.

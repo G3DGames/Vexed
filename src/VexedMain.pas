@@ -60,6 +60,7 @@ uses
 procedure TForm1.DumpPDB(const AFile: String);
 var
   I: Integer;
+  V: TVexedPack;
 begin
   try
     if Assigned(PDB) then
@@ -81,6 +82,23 @@ begin
            PDB.Records[I].UniqueID,
            Length(PDB.Records[I].Data),
            BoolToStr(PDB.Records[I].IsDeleted, True)]);
+
+        DebugAdd('');
+
+        V := PDB.Records[0].Vexed;
+        DebugAdd('Author : %s', [V.Info.Author]);
+        DebugAdd('URL : %s', [V.Info.Url]);
+        DebugAdd('Desc : %s', [V.Info.Description]);
+        DebugAdd('');
+
+        for I := 0 to V.LevelCount -1 do
+          begin
+            DebugAdd('Title : %s',[V.Level[I].Title]);
+            DebugAdd('Board : %s',[V.Level[I].Board]);
+            DebugAdd('Solve : %s',[V.Level[I].Solution]);
+            DebugAdd('');
+          end;
+
     finally
 //      PDB.Free;
     end;
