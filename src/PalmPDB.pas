@@ -58,20 +58,6 @@ type
     property Size: Integer read FSize;
   end;
 
-  TVexedInfo = class // Marked by General, followed by KV stream
-  strict private
-    FAuthor: String;
-    FUrl: String;
-    FDescription: String;
-  public
-    procedure SetAuthor(const AValue: String);
-    procedure SetUrl(const AValue: String);
-    procedure SetDescription(const AValue: String);
-    property Author: String read FAuthor;
-    property Url: String read FUrl;
-    property Description: String read FDescription;
-  end;
-
   TVexedLevel = class // Marked by Level, followed by KV stream
   strict private
     FBoard: String;
@@ -87,19 +73,22 @@ type
   end;
 
   TVexedPack = class // A Vexed pack containing Info and multiple levels
-  strict private
-    FInfo: TVexedInfo;
+  private
+    FAuthor: String;
+    FUrl: String;
+    FDescription: String;
     FLevels: TObjectList<TVexedLevel>;
     function GetLevel(Index: Integer): TVexedLevel;
     function GetLevelCount: Integer;
   public
     constructor Create;
     destructor Destroy; override;
-    procedure AddInfo(AValue: TVexedInfo);
     procedure AddLevel(ALevel: TVexedLevel);
+    property Author: String read FAuthor;
+    property Url: String read FUrl;
+    property Description: String read FDescription;
     property Level[Index: Integer]: TVexedLevel read GetLevel; default;
     property LevelCount: Integer read GetLevelCount;
-    property Info: TVexedInfo read FInfo;
   end;
 
   TPDBRecord = class
@@ -653,12 +642,10 @@ var
   RunLength: Integer;
   Marker: Word;
   Section, Key, Value: String;
-  LInfo: TVexedInfo;
   LLevel: TVexedLevel;
   LastRec: Boolean;
   EOL: Byte;
 begin
-  LInfo := Nil;
   LLevel := Nil;
 
   if not Assigned(Data) then
@@ -692,7 +679,6 @@ begin
       // Update RunLength. subtract chars in Section + 1 (terminating null)
       RunLength := RunLength - (Length(Section) + 1);
 
-      LInfo := TVexedInfo.Create;
       while(RunLength > 1) do
         begin
           // Read the Key
@@ -706,14 +692,14 @@ begin
           // Update RunLength. subtract chars in Value + 1 (terminating null)
           RunLength := RunLength - (Length(Value) + 1);
           if Key = 'Author' then
-            LInfo.SetAuthor(Value)
+            FVexed.FAuthor := Value
           else if Key = 'Description' then
-            LInfo.SetDescription(Value)
+            FVexed.FDescription := Value
           // Hack to fix typo in Variety Pack 13+
           else if Key = 'Descrption' then
-            LInfo.SetDescription(Value)
+            FVexed.FDescription := Value
           else if Key = 'URL' then
-            LInfo.SetUrl(Value)
+            FVexed.FUrl := Value
           else
             Raise EVexedError.Create('Unhandled Info Key/Value');
         end;
@@ -724,8 +710,6 @@ begin
             EOL := Buf.ReadByte;
             RunLength := RunLength - SizeOf(Byte);
           end;
-
-        FVexed.AddInfo(LInfo);
 
       if Buf.FPosition < Buf.FSize then
         begin
@@ -798,7 +782,6 @@ begin
     end;
 
   finally
-    LInfo.Free;
     Buf.Free;
   end;
 
@@ -1102,13 +1085,6 @@ end;
 
 { TVexedPack }
 
-procedure TVexedPack.AddInfo(AValue: TVexedInfo);
-begin
-  Finfo.SetAuthor(AValue.Author);
-  Finfo.SetUrl(AValue.Url);
-  Finfo.SetDescription(AValue.Description);
-end;
-
 procedure TVexedPack.AddLevel(ALevel: TVexedLevel);
 begin
   FLevels.Add(ALevel);
@@ -1118,7 +1094,6 @@ constructor TVexedPack.Create;
 begin
   inherited Create;
 
-  FInfo := TVexedInfo.Create;
   FLevels := TObjectList<TVexedLevel>.Create(True);
 
 end;
@@ -1126,7 +1101,6 @@ end;
 destructor TVexedPack.Destroy;
 begin
   FLevels.Free;
-  FInfo.Free;
 
   inherited;
 end;
@@ -1139,26 +1113,6 @@ end;
 function TVexedPack.GetLevelCount: Integer;
 begin
   Result := FLevels.Count;
-end;
-
-{ TVexedInfo }
-
-procedure TVexedInfo.SetAuthor(const AValue: String);
-begin
-  if AValue <> FAuthor then
-    FAuthor := AValue;
-end;
-
-procedure TVexedInfo.SetDescription(const AValue: String);
-begin
-  if AValue <> FDescription then
-    FDescription := AValue;
-end;
-
-procedure TVexedInfo.SetUrl(const AValue: String);
-begin
-  if AValue <> FUrl then
-    FUrl := AValue;
 end;
 
 { TVexedLevel }
