@@ -2,7 +2,7 @@ unit VexedMain;
 
 interface
 
-{$DEFINE SINGLETEST}
+// {$DEFINE SINGLETEST}
 
 
 uses
@@ -18,7 +18,6 @@ uses
   ;
 
 type
-  TControl3DAccess = class(TControl3D);
   TForm1 = class(TForm)
     TabControl1: TTabControl;
     GorillaTab: TTabItem;
@@ -39,7 +38,7 @@ type
   private
     { Private declarations }
     FResizing: Boolean;
-    AssetsDir: String;
+    AssetsRoot: String;
     Map: TArray<TArray<Integer>>;
     Puzzles: TGameCollection;
     Tiles: TArray<TBitmap>;
@@ -84,16 +83,16 @@ begin
   // Mac and Linux paths are provisional holding places
   // Need proper paths investigating and setting for deployment
   {$IF DEFINED(MACOS)}
-  AssetsDir := IncludeTrailingPathDelimiter(TPath.GetLibraryPath);
+  AssetsRoot := IncludeTrailingPathDelimiter(TPath.GetLibraryPath);
   {$ELSEIF DEFINED(LINUX)}
-  AssetsDir := IncludeTrailingPathDelimiter(TPath.GetHomePath);
+  AssetsRoot := IncludeTrailingPathDelimiter(TPath.GetHomePath);
   {$ELSE}
-  AssetsDir := '..' + PathDelim + '..'  + PathDelim;
+  AssetsRoot := '..' + PathDelim + '..'  + PathDelim;
   {$ENDIF}
 
   {$IF DEFINED(MSWINDOWS)}
-  if DirectoryExists('images') then
-    AssetsDir := String.Empty;
+  if DirectoryExists('assets') then
+    AssetsRoot := String.Empty;
   {$IFEND}
 
   GorillaCamera1.Parent := GorillaViewport1;
@@ -133,28 +132,33 @@ end;
 
 procedure TForm1.FormShow(Sender: TObject);
 var
-  T: Integer;
-  S : TStopwatch;
-  var L: Integer;
+  I, L, P, T: Integer;
+  S: TStopwatch;
 begin
-  DumpDisplayInfo;
 
+  L := 11;
+  P := 0;
   T := 0;
   S := TStopwatch.Create;
   S.Start;
 
   {$IF DEFINED(SINGLETEST)}
-  Puzzles := TGameCollection.CreateFromFile(AssetsDir + 'levels/Classic Levels.pdb');
-  T := 1;
-  L := random(Puzzles.Pack[0].Count);
-  Board := Puzzles.Pack[0].Level[L].Board;
+  Puzzles := TGameCollection.CreateFromFile(AssetsRoot + 'assets/levels/Classic Levels.pdb');
   {$ELSE}
-  Puzzles := TGameCollection.CreateFromFolder(AssetsDir + 'levels');
-  T := Puzzles.Count;
-  var P: Integer := random(T);
-  L := random(Puzzles.Pack[P].Count);
-  Board := Puzzles.Pack[P].Level[L].Board;
+  Puzzles := TGameCollection.CreateFromFolder(AssetsRoot + 'assets/levels');
   {$IFEND}
+
+  for I := 0 to Puzzles.Count - 1 do
+    T := T + Puzzles[I].Count;
+
+  if P >= Puzzles.Count then
+    begin
+      P := 0;
+      L := 0;
+    end;
+  if L >= Puzzles[P].Count then
+    L := 0;
+  Board := Puzzles.Pack[P].Level[L].Board;
 
   DebugAdd('');
   DebugAdd('Timing');
@@ -168,16 +172,16 @@ begin
   DumpCollection;
 
   SetLength(Tiles, 10);
-  Tiles[0] := TBitmap.CreateFromFile(AssetsDir + 'images/blank.png');
-  Tiles[1] := TBitmap.CreateFromFile(AssetsDir + 'images/' + Theme + '/tile1.png');
-  Tiles[2] := TBitmap.CreateFromFile(AssetsDir + 'images/' + Theme + '/tile2.png');
-  Tiles[3] := TBitmap.CreateFromFile(AssetsDir + 'images/' + Theme + '/tile3.png');
-  Tiles[4] := TBitmap.CreateFromFile(AssetsDir + 'images/' + Theme + '/tile4.png');
-  Tiles[5] := TBitmap.CreateFromFile(AssetsDir + 'images/' + Theme + '/tile5.png');
-  Tiles[6] := TBitmap.CreateFromFile(AssetsDir + 'images/' + Theme + '/tile6.png');
-  Tiles[7] := TBitmap.CreateFromFile(AssetsDir + 'images/' + Theme + '/tile7.png');
-  Tiles[8] := TBitmap.CreateFromFile(AssetsDir + 'images/' + Theme + '/tile8.png');
-  Tiles[9] := TBitmap.CreateFromFile(AssetsDir + 'images/wall.png');
+  Tiles[0] := TBitmap.CreateFromFile(AssetsRoot + 'assets/images/blank.png');
+  Tiles[1] := TBitmap.CreateFromFile(AssetsRoot + 'assets/images/' + Theme + '/tile1.png');
+  Tiles[2] := TBitmap.CreateFromFile(AssetsRoot + 'assets/images/' + Theme + '/tile2.png');
+  Tiles[3] := TBitmap.CreateFromFile(AssetsRoot + 'assets/images/' + Theme + '/tile3.png');
+  Tiles[4] := TBitmap.CreateFromFile(AssetsRoot + 'assets/images/' + Theme + '/tile4.png');
+  Tiles[5] := TBitmap.CreateFromFile(AssetsRoot + 'assets/images/' + Theme + '/tile5.png');
+  Tiles[6] := TBitmap.CreateFromFile(AssetsRoot + 'assets/images/' + Theme + '/tile6.png');
+  Tiles[7] := TBitmap.CreateFromFile(AssetsRoot + 'assets/images/' + Theme + '/tile7.png');
+  Tiles[8] := TBitmap.CreateFromFile(AssetsRoot + 'assets/images/' + Theme + '/tile8.png');
+  Tiles[9] := TBitmap.CreateFromFile(AssetsRoot + 'assets/images/wall.png');
 
   RenderTileMap(GorillaViewport1, Board, Tiles);
 

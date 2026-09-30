@@ -9,13 +9,47 @@ type
   EByteBufferError = class(Exception);
   EVexedError = class(Exception);
 
+  TVexedLevel = class // Marked by Level, followed by KV stream
+  strict private
+    FBoard: String;
+    FSolution: String;
+    FTitle: String;
+  public
+    procedure SetBoard(const AValue: String);
+    procedure SetSolution(const AValue: String);
+    procedure SetTitle(const AValue: String);
+    property Board: String read FBoard write SetBoard;
+    property Solution: String read FSolution write SetSolution;
+    property Title: String read FTitle write SetTitle;
+  end;
+
+  TVexedPack = class // A Vexed pack containing Info and multiple levels
+  strict private
+    FAuthor: String;
+    FUrl: String;
+    FDescription: String;
+    FLevels: TObjectList<TVexedLevel>;
+    function GetLevel(Index: Integer): TVexedLevel;
+    function GetLevelCount: Integer;
+    procedure SetAuthor(const AValue: String);
+    procedure SetUrl(const AValue: String);
+    procedure SetDescription(const AValue: String);
+  public
+    constructor Create;
+    destructor Destroy; override;
+    procedure AddLevel(ALevel: TVexedLevel);
+    property Author: String read FAuthor write SetAuthor;
+    property Url: String read FUrl write SetUrl;
+    property Description: String read FDescription write SetDescription;
+    property Level[Index: Integer]: TVexedLevel read GetLevel; default;
+    property LevelCount: Integer read GetLevelCount;
+  end;
+
   TByteBuffer = class
   private
     FBuffer: TBytes;
-    FPosition: Integer; // read/write cursor
+    FPosition: Integer; // read cursor
     FSize: Integer;     // logical length of valid data
-    procedure EnsureCapacity(ARequired: Integer);
-    procedure CheckReadable(ACount: Integer);
     function ReadByteAt(APos: Integer): Byte;
     function ReadWordAt(APos: Integer): Word;
     function ReadStringAt(APos: Integer; out ANextPos: Integer): string;
@@ -33,14 +67,6 @@ type
     function PeekWord: Word;
     function PeekString: string;
 
-    // --- Writing (extends buffer, advances cursor) ---
-    procedure WriteWord(AValue: Word);
-    procedure WriteString(const AValue: string);
-
-    // --- Overwrite-in-place (does not extend FSize) ---
-    procedure OverwriteWord(AValue: Word);
-    procedure OverwriteString(const AValue: string);
-
     // --- Navigation / state ---
     procedure Seek(APosition: Integer);
     function Eof: Boolean;
@@ -48,47 +74,12 @@ type
     // --- Fixed-width string slots ---
     function ReadFixedString(ASlotSize: Integer): string;
     function PeekFixedString(ASlotSize: Integer): string;
-    procedure WriteFixedString(const AValue: string; ASlotSize: Integer);
-    procedure OverwriteFixedString(const AValue: string; ASlotSize: Integer);
 
     // --- Access ---
     function ToBytes: TBytes;
 
     property Position: Integer read FPosition;
     property Size: Integer read FSize;
-  end;
-
-  TVexedLevel = class // Marked by Level, followed by KV stream
-  strict private
-    FBoard: String;
-    FSolution: String;
-    FTitle: String;
-  public
-    procedure SetBoard(const AValue: String);
-    procedure SetSolution(const AValue: String);
-    procedure SetTitle(const AValue: String);
-    property Board: String read FBoard;
-    property Solution: String read FSolution;
-    property Title: String read FTitle;
-  end;
-
-  TVexedPack = class // A Vexed pack containing Info and multiple levels
-  private
-    FAuthor: String;
-    FUrl: String;
-    FDescription: String;
-    FLevels: TObjectList<TVexedLevel>;
-    function GetLevel(Index: Integer): TVexedLevel;
-    function GetLevelCount: Integer;
-  public
-    constructor Create;
-    destructor Destroy; override;
-    procedure AddLevel(ALevel: TVexedLevel);
-    property Author: String read FAuthor;
-    property Url: String read FUrl;
-    property Description: String read FDescription;
-    property Level[Index: Integer]: TVexedLevel read GetLevel; default;
-    property LevelCount: Integer read GetLevelCount;
   end;
 
   TPDBRecord = class
@@ -182,32 +173,6 @@ begin
   FSize := Length(FBuffer);
 end;
 
-procedure TByteBuffer.EnsureCapacity(ARequired: Integer);
-var
-  NewCap: Integer;
-begin
-  if ARequired <= Length(FBuffer) then
-    Exit;
-
-  NewCap := Length(FBuffer);
-  if NewCap < GROW_MIN then
-    NewCap := GROW_MIN;
-  while NewCap < ARequired do
-    NewCap := NewCap * 2;
-
-  SetLength(FBuffer, NewCap);
-end;
-
-procedure TByteBuffer.CheckReadable(ACount: Integer);
-begin
-  if ACount < 0 then
-    raise EByteBufferError.Create('Negative read count');
-  if FPosition + ACount > FSize then
-    raise EByteBufferError.CreateFmt(
-      'Read past end of buffer (pos=%d, need=%d, size=%d)',
-      [FPosition, ACount, FSize]);
-end;
-
 // --- Positional primitives (shared by read & peek) ---
 
 function TByteBuffer.ReadByteAt(APos: Integer): Byte;
@@ -293,74 +258,6 @@ begin
   Result := ReadStringAt(FPosition, NextPos);
 end;
 
-// --- Writing (extends buffer, advances cursor) ---
-
-procedure TByteBuffer.WriteWord(AValue: Word);
-begin
-  EnsureCapacity(FPosition + SizeOf(Word));
-  // Big-endian: high byte first.
-  FBuffer[FPosition]     := Byte((AValue shr 8) and $FF);
-  FBuffer[FPosition + 1] := Byte(AValue and $FF);
-  Inc(FPosition, SizeOf(Word));
-  if FPosition > FSize then
-    FSize := FPosition;
-end;
-
-procedure TByteBuffer.WriteString(const AValue: string);
-var
-  Raw: TBytes;
-  Len: Integer;
-begin
-  Raw := TEncoding.ANSI.GetBytes(AValue);
-  Len := Length(Raw);
-
-  EnsureCapacity(FPosition + Len + 1);
-  if Len > 0 then
-    Move(Raw[0], FBuffer[FPosition], Len);
-  Inc(FPosition, Len);
-
-  FBuffer[FPosition] := 0; // C-style null terminator
-  Inc(FPosition);
-
-  if FPosition > FSize then
-    FSize := FPosition;
-end;
-
-// --- Overwrite-in-place (does not extend FSize) ---
-
-procedure TByteBuffer.OverwriteWord(AValue: Word);
-begin
-  if FPosition + SizeOf(Word) > FSize then
-    raise EByteBufferError.CreateFmt(
-      'Overwrite past end of valid data (pos=%d, need=%d, size=%d)',
-      [FPosition, SizeOf(Word), FSize]);
-
-  FBuffer[FPosition]     := Byte((AValue shr 8) and $FF);
-  FBuffer[FPosition + 1] := Byte(AValue and $FF);
-  Inc(FPosition, SizeOf(Word));
-end;
-
-procedure TByteBuffer.OverwriteString(const AValue: string);
-var
-  Raw: TBytes;
-  Len, Total: Integer;
-begin
-  Raw := TEncoding.ANSI.GetBytes(AValue);
-  Len := Length(Raw);
-  Total := Len + 1; // include null terminator
-
-  if FPosition + Total > FSize then
-    raise EByteBufferError.CreateFmt(
-      'Overwrite past end of valid data (pos=%d, need=%d, size=%d)',
-      [FPosition, Total, FSize]);
-
-  if Len > 0 then
-    Move(Raw[0], FBuffer[FPosition], Len);
-  Inc(FPosition, Len);
-
-  FBuffer[FPosition] := 0;
-  Inc(FPosition);
-end;
 
 // --- Navigation / state ---
 
@@ -422,67 +319,6 @@ begin
   Result := ReadFixedStringAt(FPosition, ASlotSize);
 end;
 
-procedure TByteBuffer.WriteFixedString(const AValue: string; ASlotSize: Integer);
-var
-  Raw: TBytes;
-  Len: Integer;
-begin
-  if ASlotSize < 1 then
-    raise EByteBufferError.Create(
-      'Slot size must be at least 1 (room for a null terminator)');
-
-  Raw := TEncoding.ANSI.GetBytes(AValue);
-  Len := Length(Raw);
-
-  // Must fit the string AND at least one null terminator inside the slot.
-  if Len >= ASlotSize then
-    raise EByteBufferError.CreateFmt(
-      'String too long for slot (bytes=%d, slot=%d, need <=%d)',
-      [Len, ASlotSize, ASlotSize - 1]);
-
-  EnsureCapacity(FPosition + ASlotSize);
-
-  // Zero-fill the whole slot first so no stale bytes remain.
-  FillChar(FBuffer[FPosition], ASlotSize, 0);
-  if Len > 0 then
-    Move(Raw[0], FBuffer[FPosition], Len);
-
-  Inc(FPosition, ASlotSize);
-  if FPosition > FSize then
-    FSize := FPosition;
-end;
-
-procedure TByteBuffer.OverwriteFixedString(const AValue: string;
-  ASlotSize: Integer);
-var
-  Raw: TBytes;
-  Len: Integer;
-begin
-  if ASlotSize < 1 then
-    raise EByteBufferError.Create(
-      'Slot size must be at least 1 (room for a null terminator)');
-
-  Raw := TEncoding.ANSI.GetBytes(AValue);
-  Len := Length(Raw);
-
-  if Len >= ASlotSize then
-    raise EByteBufferError.CreateFmt(
-      'String too long for slot (bytes=%d, slot=%d, need <=%d)',
-      [Len, ASlotSize, ASlotSize - 1]);
-
-  // Overwrite must stay within existing valid data; never extend FSize.
-  if FPosition + ASlotSize > FSize then
-    raise EByteBufferError.CreateFmt(
-      'Overwrite past end of valid data (pos=%d, need=%d, size=%d)',
-      [FPosition, ASlotSize, FSize]);
-
-  // Zero-fill the entire slot to clear any previous, longer contents.
-  FillChar(FBuffer[FPosition], ASlotSize, 0);
-  if Len > 0 then
-    Move(Raw[0], FBuffer[FPosition], Len);
-
-  Inc(FPosition, ASlotSize);
-end;
 
 { ============================================================
   Endianness helpers.
@@ -644,10 +480,7 @@ var
   Section, Key, Value: String;
   LLevel: TVexedLevel;
   LastRec: Boolean;
-  EOL: Byte;
 begin
-  LLevel := Nil;
-
   if not Assigned(Data) then
     begin
       if Assigned(FVexed) then
@@ -692,14 +525,14 @@ begin
           // Update RunLength. subtract chars in Value + 1 (terminating null)
           RunLength := RunLength - (Length(Value) + 1);
           if Key = 'Author' then
-            FVexed.FAuthor := Value
+            FVexed.Author := Value
           else if Key = 'Description' then
-            FVexed.FDescription := Value
+            FVexed.Description := Value
           // Hack to fix typo in Variety Pack 13+
           else if Key = 'Descrption' then
-            FVexed.FDescription := Value
+            FVexed.Description := Value
           else if Key = 'URL' then
-            FVexed.FUrl := Value
+            FVexed.Url := Value
           else
             Raise EVexedError.Create('Unhandled Info Key/Value');
         end;
@@ -707,8 +540,7 @@ begin
         // Potential Padding
         if (RunLength > 0) then
           begin
-            EOL := Buf.ReadByte;
-            RunLength := RunLength - SizeOf(Byte);
+            Buf.ReadByte;
           end;
 
       if Buf.FPosition < Buf.FSize then
@@ -754,11 +586,11 @@ begin
                   // Update RunLength. subtract chars in Value + 1 (terminating null)
                   RunLength := RunLength - (Length(Value) + 1);
                   if Key = 'board' then
-                    LLevel.SetBoard(Value)
+                    LLevel.Board := Value
                   else if Key = 'solution' then
-                    LLevel.SetSolution(Value)
+                    LLevel.Solution := Value
                   else if Key = 'title' then
-                    LLevel.SetTitle(Value)
+                    LLevel.Title := Value
                   else
                     Raise EVexedError.Create('Unhandled Level Key/Value');
                 end;
@@ -766,8 +598,7 @@ begin
               // Potential Padding Byte
               if (RunLength > 0) then
                 begin
-                  EOL := Buf.ReadByte;
-                  RunLength := RunLength - SizeOf(Byte);
+                  Buf.ReadByte;
                 end;
 
 
@@ -1113,6 +944,24 @@ end;
 function TVexedPack.GetLevelCount: Integer;
 begin
   Result := FLevels.Count;
+end;
+
+procedure TVexedPack.SetAuthor(const AValue: String);
+begin
+  if AValue <> FAuthor then
+    FAuthor := AValue;
+end;
+
+procedure TVexedPack.SetDescription(const AValue: String);
+begin
+  if AValue <> FDescription then
+    FDescription := AValue;
+end;
+
+procedure TVexedPack.SetUrl(const AValue: String);
+begin
+  if AValue <> FUrl then
+    FUrl := AValue;
 end;
 
 { TVexedLevel }

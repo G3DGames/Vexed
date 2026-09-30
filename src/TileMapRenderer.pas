@@ -33,75 +33,15 @@ uses
 ///   Width/Height (in 3D units) each tile is drawn at, and the spacing step
 ///   between grid cells.
 /// </param>
-procedure RenderTileMap(AParent: TFmxObject; const Map: TArray<TArray<Integer>>;
-  const Tiles: TArray<TBitmap>; TileSize: Single = 64); overload;
 procedure RenderTileMap(AParent: TFmxObject; const Map: TVexedBoard;
-  const Tiles: TArray<TBitmap>; TileSize: Single = 128); overload;
+  const Tiles: TArray<TBitmap>; TileSize: Single = 128);
 
 implementation
-
-procedure RenderTileMap(AParent: TFmxObject; const Map: TArray<TArray<Integer>>;
-  const Tiles: TArray<TBitmap>; TileSize: Single = 64);
-var
-  X, Y: Integer;
-  MapWidth, MapHeight: Integer;
-  TileIndex: Integer;
-  Layer: TImage3D;
-  i: Integer;
-begin
-  if AParent = nil then
-    raise EArgumentException.Create('AParent must not be nil');
-
-  MapWidth := Length(Map);
-  if MapWidth = 0 then
-    Exit;
-  MapHeight := Length(Map[0]);
-  if MapHeight = 0 then
-    Exit;
-
-  // Clear out any tiles from a previous render, so this can be called
-  // repeatedly (e.g. when switching levels) without leaking layers.
-  for i := AParent.ChildrenCount - 1 downto 0 do
-    if AParent.Children[i] is TImage3D then
-      AParent.Children[i].Free;
-
-  for X := 0 to MapWidth - 1 do
-  begin
-    if Length(Map[X]) <> MapHeight then
-      raise Exception.CreateFmt('Map is not rectangular: column %d has %d rows, expected %d',
-        [X, Length(Map[X]), MapHeight]);
-
-    for Y := 0 to MapHeight - 1 do
-    begin
-      TileIndex := Map[X][Y];
-
-      // Skip empty / invalid cells rather than raising, so sparse maps work.
-      if (TileIndex < 0) or (TileIndex > High(Tiles)) or (Tiles[TileIndex] = nil) then
-        Continue;
-
-      Layer := TImage3D.Create(AParent);
-      Layer.Parent := AParent;
-      Layer.Width  := TileSize;
-      Layer.Height := TileSize;
-
-      // Copy the tile bitmap into the layer's own Bitmap.
-      Layer.Bitmap.Assign(Tiles[TileIndex]);
-
-      // Lay the grid out on the XY plane, Z = 0.
-      // FMX 3D's Y axis points downward on screen by default, which matches
-      // typical row-major map layouts (row 0 at the top).
-      Layer.Position.Point := TPoint3D.Create(X * TileSize, Y * TileSize, 0);
-
-      Layer.HitTest := False; // tiles are just visuals; flip on if you need picking
-    end;
-  end;
-end;
-
 
 procedure RenderTileMap(AParent: TFmxObject; const Map: TVexedBoard;
   const Tiles: TArray<TBitmap>; TileSize: Single = 128);
 var
-  X, Y: Integer;
+  Row, Col: Integer;
   MapWidth, MapHeight: Integer;
   TileIndex: Integer;
   Layer: TImage3D;
@@ -110,11 +50,11 @@ begin
   if AParent = nil then
     raise EArgumentException.Create('AParent must not be nil');
 
-  MapWidth := Length(Map);
-  if MapWidth = 0 then
-    Exit;
-  MapHeight := Length(Map[0]);
+  MapHeight := Length(Map);
   if MapHeight = 0 then
+    Exit;
+  MapWidth := Length(Map[0]);
+  if MapWidth = 0 then
     Exit;
 
   // Clear out any tiles from a previous render, so this can be called
@@ -123,15 +63,12 @@ begin
     if AParent.Children[i] is TImage3D then
       AParent.Children[i].Free;
 
-  for X := 0 to MapWidth - 1 do
+  for Row := 0 to MapHeight - 1 do
   begin
-    if Length(Map[X]) <> MapHeight then
-      raise Exception.CreateFmt('Map is not rectangular: column %d has %d rows, expected %d',
-        [X, Length(Map[X]), MapHeight]);
 
-    for Y := 0 to MapHeight - 1 do
+    for Col := 0 to MapWidth - 1 do
     begin
-      TileIndex := Map[X][Y];
+      TileIndex := Map[Row][Col];
 
       // Skip empty / invalid cells rather than raising, so sparse maps work.
       if (TileIndex < 0) or (TileIndex > High(Tiles)) or (Tiles[TileIndex] = nil) then
@@ -148,7 +85,7 @@ begin
       // Lay the grid out on the XY plane, Z = 0.
       // FMX 3D's Y axis points downward on screen by default, which matches
       // typical row-major map layouts (row 0 at the top).
-      Layer.Position.Point := TPoint3D.Create(Y * TileSize, X * TileSize, 0);
+      Layer.Position.Point := TPoint3D.Create(Col * TileSize, Row * TileSize, 0);
 
       Layer.HitTest := False; // tiles are just visuals; flip on if you need picking
     end;
