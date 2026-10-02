@@ -113,7 +113,7 @@ begin
   {$IFDEF MACOS}
   Bundle := TNSBundle.Wrap(TNSBundle.OCClass.mainBundle);
   if Bundle <> nil then
-    Result := NSStrToStr(Bundle.resourcePath);
+    Result := IncludeTrailingPathDelimiter(NSStrToStr(Bundle.resourcePath));
   {$ENDIF}
 end;
 
@@ -137,7 +137,7 @@ begin
   until False;
 
   // readlink doesn't null-terminate, and the path is UTF-8 bytes
-  Result := ExtractFilePath(TEncoding.UTF8.GetString(Buffer, 0, Len));
+  Result := IncludeTrailingPathDelimiter(ExtractFilePath(TEncoding.UTF8.GetString(Buffer, 0, Len)));
   {$ENDIF}
 end;
 function GetAssetsPath(const DevelopmentPath: string = ''): string;

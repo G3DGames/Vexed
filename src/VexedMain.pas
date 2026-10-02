@@ -83,18 +83,13 @@ begin
   TabControl1.ActiveTab := GorillaTab;
   // Mac and Linux paths are provisional holding places
   // Need proper paths investigating and setting for deployment
-  {$IF DEFINED(MACOS)}
-  AssetsRoot := IncludeTrailingPathDelimiter(TPath.GetLibraryPath);
-  {$ELSEIF DEFINED(LINUX)}
-  AssetsRoot := IncludeTrailingPathDelimiter(TPath.GetHomePath);
-  {$ELSE}
-  AssetsRoot := '..' + PathDelim + '..'  + PathDelim;
-  {$ENDIF}
-
+  AssetsRoot := GetAssetsPath('../..');
   {$IF DEFINED(MSWINDOWS)}
   if DirectoryExists('assets') then
     AssetsRoot := String.Empty;
   {$IFEND}
+  if(not DirectoryExists(AssetsRoot)) then
+    exit;
 
   GorillaCamera1.Parent := GorillaViewport1;
   GorillaCamera1.ProjectionMode := cpOrthographic;
@@ -138,6 +133,8 @@ var
   I, L, P, T: Integer;
   S: TStopwatch;
 begin
+  if(not DirectoryExists(AssetsRoot)) then
+    exit;
 
   L := 0;//11;
   P := 0;
@@ -150,10 +147,11 @@ begin
   {$ELSE}
   Puzzles := TGameCollection.CreateFromFolder(AssetsRoot + 'assets/levels');
   {$IFEND}
-//  if Puzzles.Pack = Nil then
-//    begin
-//      exit;
-//    end;
+  if Puzzles.Count = 0 then
+    begin
+      DebugAdd(AssetsRoot + 'assets/levels');
+      exit;
+    end;
 
   for I := 0 to Puzzles.Count - 1 do
     T := T + Puzzles[I].Count;
