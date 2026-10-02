@@ -136,7 +136,7 @@ var
   S: TStopwatch;
 begin
 
-  L := 11;
+  L := 0;//11;
   P := 0;
   T := 0;
   S := TStopwatch.Create;
@@ -147,6 +147,10 @@ begin
   {$ELSE}
   Puzzles := TGameCollection.CreateFromFolder(AssetsRoot + 'assets/levels');
   {$IFEND}
+//  if Puzzles.Pack = Nil then
+//    begin
+//      exit;
+//    end;
 
   for I := 0 to Puzzles.Count - 1 do
     T := T + Puzzles[I].Count;

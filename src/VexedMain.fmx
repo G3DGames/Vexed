@@ -87,7 +87,9 @@ object Form1: TForm1
             FogStart = 100.000000000000000000
             FogEnd = 500.000000000000000000
             FogColor = claBlack
+            OpaqueSaturation = 0.000000000000000000
             TranslucentSaturation = 1.500000000000000000
+            CompositeSaturation = 0.000000000000000000
             EmissiveBlur = 0
             Shadows.CascadeSplitLambda = 0.750000000000000000
             Shadows.Strength = 1.000000000000000000
@@ -97,6 +99,7 @@ object Form1: TForm1
             GlobalIllumDetail = 0
             GlobalIllumSoftness = 1.000000000000000000
             ShadowStrength = 0.400000005960464500
+            ReflectionStrength = 0.000000000000000000
             FXAA = 0
             SSS_Enabled = False
             SSS_NumSamples = 128
@@ -107,8 +110,6 @@ object Form1: TForm1
             SSAO_Bias = 0.500000000000000000
             DiagnosticsActive = False
             RendererOutputLayer = OutputAll
-            Align = Client
-            Color = claBlack
             Size.Width = 300.000000000000000000
             Size.Height = 240.000000000000000000
             Size.PlatformDefault = False

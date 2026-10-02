@@ -11,14 +11,33 @@
     </PropertyGroup>
     <ItemGroup Condition="'$(Platform)'=='WinARM64EC'"/>
     <ItemGroup Condition="'$(Platform)'=='OSX64'">
-        <DeployFile Include="OSX64\Debug\Vexed.dSYM" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>Vexed.app\..\$(PROJECTNAME).app.dSYM\Contents\Resources\DWARF\</RemoteDir>
-            <RemoteName>Vexed</RemoteName>
-            <DeployClass>ProjectOSXDebug</DeployClass>
+        <DeployFile Include="OSX64\Debug\Vexed.info.plist" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>Vexed.app\Contents\</RemoteDir>
+            <RemoteName>Info.plist</RemoteName>
+            <DeployClass>ProjectOSXInfoPList</DeployClass>
             <Operation>1</Operation>
             <LocalCommand/>
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
+        </DeployFile>
+        <DeployFile Include="OSX64\Release\Vexed.entitlements" Condition="'$(Config)'=='Release'">
+            <RemoteDir>Vexed.app\..\</RemoteDir>
+            <RemoteName>Vexed.entitlements</RemoteName>
+            <DeployClass>ProjectOSXEntitlements</DeployClass>
+            <Operation>1</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
+        <DeployFile Include="OSX64\Release\Vexed" Condition="'$(Config)'=='Release'">
+            <RemoteDir>Vexed.app\Contents\MacOS\</RemoteDir>
+            <RemoteName>Vexed</RemoteName>
+            <DeployClass>ProjectOutput</DeployClass>
+            <Operation>1</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+            <Required>True</Required>
         </DeployFile>
         <DeployFile Include="OSX64\Debug\Vexed.entitlements" Condition="'$(Config)'=='Debug'">
             <RemoteDir>Vexed.app\..\</RemoteDir>
@@ -48,7 +67,42 @@
             <Overwrite>True</Overwrite>
             <Required>True</Required>
         </DeployFile>
-        <DeployFile Include="OSX64\Debug\Vexed.info.plist" Condition="'$(Config)'=='Debug'">
+        <DeployFile Include="$(BDS)\bin\delphi_PROJECTICNS.icns" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>Vexed.app\Contents\Resources\</RemoteDir>
+            <RemoteName>Vexed.icns</RemoteName>
+            <DeployClass>ProjectOSXResource</DeployClass>
+            <Operation>1</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
+        <DeployFile Include="$(BDS)\bin\delphi_PROJECTICNS.icns" Condition="'$(Config)'=='Release'">
+            <RemoteDir>Vexed.app\Contents\Resources\</RemoteDir>
+            <RemoteName>Vexed.icns</RemoteName>
+            <DeployClass>ProjectOSXResource</DeployClass>
+            <Operation>1</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
+    </ItemGroup>
+    <ItemGroup Condition="'$(Platform)'=='Win32'">
+        <DeployFile Include="Win32\Debug\Vexed.exe" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>Vexed\</RemoteDir>
+            <RemoteName>Vexed.exe</RemoteName>
+            <DeployClass>ProjectOutput</DeployClass>
+            <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+            <Required>True</Required>
+        </DeployFile>
+    </ItemGroup>
+    <ItemGroup Condition="'$(Platform)'=='Android64'"/>
+    <ItemGroup Condition="'$(Platform)'=='Android'"/>
+    <ItemGroup Condition="'$(Platform)'=='Win64'"/>
+    <ItemGroup Condition="'$(Platform)'=='OSXARM64'">
+        <DeployFile Include="OSXARM64\Debug\Vexed.info.plist" Condition="'$(Config)'=='Debug'">
             <RemoteDir>Vexed.app\Contents\</RemoteDir>
             <RemoteName>Info.plist</RemoteName>
             <DeployClass>ProjectOSXInfoPList</DeployClass>
@@ -57,7 +111,7 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="OSX64\Release\Vexed.entitlements" Condition="'$(Config)'=='Release'">
+        <DeployFile Include="OSXARM64\Release\Vexed.entitlements" Condition="'$(Config)'=='Release'">
             <RemoteDir>Vexed.app\..\</RemoteDir>
             <RemoteName>Vexed.entitlements</RemoteName>
             <DeployClass>ProjectOSXEntitlements</DeployClass>
@@ -84,7 +138,7 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="OSX64\Release\Vexed" Condition="'$(Config)'=='Release'">
+        <DeployFile Include="OSXARM64\Release\Vexed" Condition="'$(Config)'=='Release'">
             <RemoteDir>Vexed.app\Contents\MacOS\</RemoteDir>
             <RemoteName>Vexed</RemoteName>
             <DeployClass>ProjectOutput</DeployClass>
@@ -94,23 +148,35 @@
             <Overwrite>True</Overwrite>
             <Required>True</Required>
         </DeployFile>
-    </ItemGroup>
-    <ItemGroup Condition="'$(Platform)'=='Win32'">
-        <DeployFile Include="Win32\Debug\Vexed.exe" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>Vexed\</RemoteDir>
-            <RemoteName>Vexed.exe</RemoteName>
+        <DeployFile Include="OSXARM64\Debug\Vexed.entitlements" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>Vexed.app\..\</RemoteDir>
+            <RemoteName>Vexed.entitlements</RemoteName>
+            <DeployClass>ProjectOSXEntitlements</DeployClass>
+            <Operation>1</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
+        <DeployFile Include="OSXARM64\Debug\Vexed" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>Vexed.app\Contents\MacOS\</RemoteDir>
+            <RemoteName>Vexed</RemoteName>
             <DeployClass>ProjectOutput</DeployClass>
-            <Operation>0</Operation>
+            <Operation>1</Operation>
             <LocalCommand/>
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
             <Required>True</Required>
         </DeployFile>
+        <DeployFile Include="OSXARM64\Release\Vexed.info.plist" Condition="'$(Config)'=='Release'">
+            <RemoteDir>Vexed.app\Contents\</RemoteDir>
+            <RemoteName>Info.plist</RemoteName>
+            <DeployClass>ProjectOSXInfoPList</DeployClass>
+            <Operation>1</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
     </ItemGroup>
-    <ItemGroup Condition="'$(Platform)'=='Android64'"/>
-    <ItemGroup Condition="'$(Platform)'=='Android'"/>
-    <ItemGroup Condition="'$(Platform)'=='Win64'"/>
-    <ItemGroup Condition="'$(Platform)'=='OSXARM64'"/>
     <ItemGroup Condition="'$(Platform)'=='iOSDevice64'"/>
     <ItemGroup Condition="'$(Platform)'=='iOSSimARM64'"/>
     <ItemGroup Condition="'$(Platform)'=='Win64x'"/>
