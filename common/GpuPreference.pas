@@ -1,6 +1,7 @@
 unit GpuPreference;
 
 interface
+{$if defined(MSWINDOWS)}
 
 type
   TGpuPreference = (gpAutomatic, gpPowerSaving, gpHighPerformance);
@@ -15,14 +16,14 @@ function SetGpuPreference(const APreference: TGpuPreference): Boolean;
 /// Returns True if a usable preference is available (existing or newly set).
 function GetGpuPreference(out APreference: TGpuPreference;
   const ADefault: TGpuPreference = gpHighPerformance): Boolean;
+{$ifend}
 
 implementation
 
+{$if defined(MSWINDOWS)}
 uses
-  {$if defined(MSWINDOWS)}
   System.Win.Registry,
   Winapi.Windows,
-  {$ifend}
   System.SysUtils;
 
 const
@@ -125,5 +126,7 @@ begin
   else
     Result := False;
 end;
+
+{$ifend}
 
 end.

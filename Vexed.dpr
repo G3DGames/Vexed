@@ -7,14 +7,15 @@ uses
   VexedMain in 'src\VexedMain.pas' {Form1},
   {$if defined(MSWINDOWS)}
   DisplayData in 'common\DisplayData.pas',
-GpuPreference in 'common\GpuPreference.pas',
   {$if defined(WIN32)}
   Windows,
   {$ifend }
   {$ifend }
   TileMapRenderer in 'src\TileMapRenderer.pas',
   PalmPDB in 'src\PalmPDB.pas',
-  VexedLib in 'src\VexedLib.pas';
+  VexedLib in 'src\VexedLib.pas',
+  OSPaths in 'common\OSPaths.pas',
+  GpuPreference in 'common\GpuPreference.pas';
 
 // Win32 ONLY needs IMAGE_FILE_LARGE_ADDRESS_AWARE
 {$if defined(MSWINDOWS) and defined(WIN32)}

@@ -4,7 +4,7 @@
         <ProjectVersion>20.5</ProjectVersion>
         <FrameworkType>FMX</FrameworkType>
         <Base>True</Base>
-        <Config Condition="'$(Config)'==''">Release</Config>
+        <Config Condition="'$(Config)'==''">Debug</Config>
         <Platform Condition="'$(Platform)'==''">Win64</Platform>
         <TargetedPlatforms>2790547</TargetedPlatforms>
         <AppType>Application</AppType>
@@ -349,6 +349,8 @@
         <DCCReference Include="src\TileMapRenderer.pas"/>
         <DCCReference Include="src\PalmPDB.pas"/>
         <DCCReference Include="src\VexedLib.pas"/>
+        <DCCReference Include="common\OSPaths.pas"/>
+        <DCCReference Include="common\GpuPreference.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
@@ -614,6 +616,24 @@
                 </DeployFile>
                 <DeployFile LocalName="Win32\Debug\Vexed.exe" Configuration="Debug" Class="ProjectOutput">
                     <Platform Name="Win32">
+                        <RemoteName>Vexed.exe</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="Win64\Debug\Vexed.exe" Configuration="Debug" Class="ProjectOutput">
+                    <Platform Name="Win64">
+                        <RemoteName>Vexed.exe</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="Win64\Debug\Vexed.rsm" Configuration="Debug" Class="DebugSymbols">
+                    <Platform Name="Win64">
+                        <RemoteName>Vexed.rsm</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="Win64\Release\Vexed.exe" Configuration="Release" Class="ProjectOutput">
+                    <Platform Name="Win64">
                         <RemoteName>Vexed.exe</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>

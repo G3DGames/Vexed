@@ -65,6 +65,7 @@ implementation
 uses
   System.IOUtils,
   FMX.Platform,
+  OSPaths,
 {$IF DEFINED(DMSWINDOWS)}
   DisplayData,
 {$IFEND}
@@ -121,7 +122,9 @@ end;
 
 procedure TForm1.FormResize(Sender: TObject);
 begin
-  Caption := Format('Width : %f, Height : %f',[GorillaViewport1.Width, GorillaViewport1.Height]);
+  Caption := Format('Width : %f, Height : %f',
+    [GorillaViewport1.Width, GorillaViewport1.Height]) +
+    ' : ' + GetAssetsPath('../..');
   GameBoxResize(Nil);
 end;
 
