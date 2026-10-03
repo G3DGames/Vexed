@@ -9,10 +9,9 @@ function GetAssetsPath(const DevelopmentPath: string = ''): string;
 // Window - Return application directory
 // MacOS  - Return application bundle Resources directory
 //
-// Window (Debug running from IDE) - Returns a directory relative application
-//                                   directory as passed in DevelopmentPath
-//                                   for example '../..' that is within the
-//                                   build tree
+// Window (Running from IDE) - Returns a directory relative application
+//                             directory as passed in DevelopmentPath for
+//                             example '../..' that is within the build tree
 //
 // All returned paths will have the OS relevant path delimeter at the end
 // therefore appending e.g. 'assets' + pathdelim to this would return a
@@ -20,6 +19,11 @@ function GetAssetsPath(const DevelopmentPath: string = ''): string;
 // application deployment as well
 //
 // ToDo: Android + iOS
+
+function GetBinaryPath(const DevelopmentPath: string = ''): string;
+// See GetAssetsPath
+// This is intended to allow development dynamic libraries
+// to be flexibly loaded (not as widely useful)
 
 implementation
 
@@ -78,7 +82,7 @@ begin
   end;
 end;
 
-function GetApplicationPath(const DevelopmentPath: string = ''): string;
+function GetApplicationPath: string;
 var
   Buffer: array of Char;
   Len: DWORD;
@@ -95,15 +99,10 @@ begin
   until False;
   SetString(Result, PChar(Buffer), Len);
   Result := ExtractFilePath(Result);
-
-  // When launched from the IDE, resolve DevelopmentPath relative to the exe folder
-  if (DevelopmentPath <> '') and IsRunningFromIDE then
-    Result := IncludeTrailingPathDelimiter(
-      ExpandFileName(TPath.Combine(Result, DevelopmentPath)));
 end;
 {$ENDIF}
 
-function GetBundleResourcePath: string;
+function GetMacBundleResourcePath: string;
 {$IFDEF MACOS}
 var
   Bundle: NSBundle;
@@ -114,6 +113,20 @@ begin
   Bundle := TNSBundle.Wrap(TNSBundle.OCClass.mainBundle);
   if Bundle <> nil then
     Result := IncludeTrailingPathDelimiter(NSStrToStr(Bundle.resourcePath));
+  {$ENDIF}
+end;
+
+function GetMacBundleBinaryPath: string;
+{$IFDEF MACOS}
+var
+  Bundle: NSBundle;
+{$ENDIF}
+begin
+  Result := '';
+  {$IFDEF MACOS}
+  Bundle := TNSBundle.Wrap(TNSBundle.OCClass.mainBundle);
+  if Bundle <> nil then
+    Result := IncludeTrailingPathDelimiter(ExtractFilePath(NSStrToStr(Bundle.executablePath)));
   {$ENDIF}
 end;
 
@@ -143,12 +156,32 @@ end;
 function GetAssetsPath(const DevelopmentPath: string = ''): string;
 begin
   {$IFDEF MACOS}
-  Result := GetBundleResourcePath;
+  Result := GetMacBundleResourcePath;
   {$ELSEIF DEFINED(MSWINDOWS)}
-  Result := GetApplicationPath(DevelopmentPath);
+  Result := GetApplicationPath;
+  // When launched from the IDE, resolve DevelopmentPath relative to the exe folder
+  if (DevelopmentPath <> '') and IsRunningFromIDE then
+    Result := IncludeTrailingPathDelimiter(
+      ExpandFileName(TPath.Combine(Result, DevelopmentPath)));
   {$ELSEIF DEFINED(LINUX)}
   Result := GetLinuxApplicationPath;
   {$ENDIF}
 end;
+
+function GetBinaryPath(const DevelopmentPath: string = ''): string;
+begin
+  {$IFDEF MACOS}
+  Result := GetMacBundleBinaryPath;
+  {$ELSEIF DEFINED(MSWINDOWS)}
+  Result := GetApplicationPath;
+  // When launched from the IDE, resolve DevelopmentPath relative to the exe folder
+  if (DevelopmentPath <> '') and IsRunningFromIDE then
+    Result := IncludeTrailingPathDelimiter(
+      ExpandFileName(TPath.Combine(Result, DevelopmentPath)));
+  {$ELSEIF DEFINED(LINUX)}
+  Result := GetLinuxApplicationPath;
+  {$ENDIF}
+end;
+
 
 end.

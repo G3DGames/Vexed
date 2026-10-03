@@ -91,6 +91,9 @@ begin
   if(not DirectoryExists(AssetsRoot)) then
     exit;
 
+  DebugAdd('Assets = ' + AssetsRoot);
+  DebugAdd('ProgDir = ' + GetBinaryPath);
+
   GorillaCamera1.Parent := GorillaViewport1;
   GorillaCamera1.ProjectionMode := cpOrthographic;
   GorillaCamera1.OrthoHeight := 1024;
