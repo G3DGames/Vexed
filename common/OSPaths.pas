@@ -29,7 +29,11 @@ implementation
 
 uses
   System.SysUtils
-{$IF DEFINED(MACOS)}
+  {$IF DEFINED(IOS)}
+  , iOSapi.Foundation, iOSapi.Helpers
+  {$ELSEIF DEFINED(ANDROID)}
+  , Androidapi.Helpers, Androidapi.JNI.GraphicsContentViewText
+  {$ELSEIF DEFINED(MACOS)}
   , Macapi.Foundation, Macapi.Helpers
 {$ELSEIF DEFINED(MSWINDOWS)}
   , System.IOUtils, Winapi.Windows, Winapi.TlHelp32
@@ -38,7 +42,7 @@ uses
 {$ENDIF}
 ;
 
-{$IFDEF MSWINDOWS}
+{$IF DEFINED(MSWINDOWS)}
 function IsRunningFromIDE: Boolean;
 var
   Snapshot: THandle;
@@ -102,14 +106,25 @@ begin
 end;
 {$ENDIF}
 
+function GetDroidApplicationResourcePath: string;
+begin
+  Result := '';
+  {$IFDEF ANDROID}
+  Result := IncludeTrailingPathDelimiter(
+    JStringToString(TAndroidHelper.Context.getFilesDir.getAbsolutePath));
+  {$ENDIF}
+end;
+
 function GetMacBundleResourcePath: string;
-{$IFDEF MACOS}
+{$IF DEFINED(IOS)}
+{$ELSEIF DEFINED(MACOS)}
 var
   Bundle: NSBundle;
 {$ENDIF}
 begin
   Result := '';
-  {$IFDEF MACOS}
+  {$IF DEFINED(IOS)}
+  {$ELSEIF DEFINED(MACOS)}
   Bundle := TNSBundle.Wrap(TNSBundle.OCClass.mainBundle);
   if Bundle <> nil then
     Result := IncludeTrailingPathDelimiter(NSStrToStr(Bundle.resourcePath));
@@ -117,13 +132,15 @@ begin
 end;
 
 function GetMacBundleBinaryPath: string;
-{$IFDEF MACOS}
+{$IF DEFINED(IOS)}
+{$ELSEIF DEFINED(MACOS)}
 var
   Bundle: NSBundle;
 {$ENDIF}
 begin
   Result := '';
-  {$IFDEF MACOS}
+  {$IF DEFINED(IOS)}
+  {$ELSEIF DEFINED(MACOS)}
   Bundle := TNSBundle.Wrap(TNSBundle.OCClass.mainBundle);
   if Bundle <> nil then
     Result := IncludeTrailingPathDelimiter(ExtractFilePath(NSStrToStr(Bundle.executablePath)));
@@ -131,14 +148,14 @@ begin
 end;
 
 function GetLinuxApplicationPath: string;
-{$IFDEF LINUX}
+{$IF DEFINED(LINUX)}
 var
   Buffer: TBytes;
   Len: ssize_t;
 {$ENDIF}
 begin
   Result := '';
-  {$IFDEF LINUX}
+  {$IF DEFINED(LINUX)}
   SetLength(Buffer, 1024);
   repeat
     Len := readlink('/proc/self/exe', MarshaledAString(Buffer), Length(Buffer));
@@ -155,7 +172,11 @@ begin
 end;
 function GetAssetsPath(const DevelopmentPath: string = ''): string;
 begin
-  {$IFDEF MACOS}
+  {$IF DEFINED(IOS)}
+  //
+  {$ELSEIF DEFINED(ANDROID)}
+  Result := GetDroidApplicationResourcePath;
+  {$ELSEIF DEFINED(MACOS)}
   Result := GetMacBundleResourcePath;
   {$ELSEIF DEFINED(MSWINDOWS)}
   Result := GetApplicationPath;
@@ -170,16 +191,24 @@ end;
 
 function GetBinaryPath(const DevelopmentPath: string = ''): string;
 begin
-  {$IFDEF MACOS}
+  {$IF DEFINED(IOS)}
+  //
+  {$ELSEIF DEFINED(ANDROID)}
+  //
+  {$ELSEIF DEFINED(MACOS)}
   Result := GetMacBundleBinaryPath;
   {$ELSEIF DEFINED(MSWINDOWS)}
   Result := GetApplicationPath;
+  if(Result = '') then
+    Result := 'assets/';
   // When launched from the IDE, resolve DevelopmentPath relative to the exe folder
   if (DevelopmentPath <> '') and IsRunningFromIDE then
     Result := IncludeTrailingPathDelimiter(
       ExpandFileName(TPath.Combine(Result, DevelopmentPath)));
   {$ELSEIF DEFINED(LINUX)}
   Result := GetLinuxApplicationPath;
+  {$ELSE}
+  ShowMesage('Unsupported OS');
   {$ENDIF}
 end;
 

@@ -4,8 +4,8 @@
         <ProjectVersion>20.5</ProjectVersion>
         <FrameworkType>FMX</FrameworkType>
         <Base>True</Base>
-        <Config Condition="'$(Config)'==''">Debug</Config>
-        <Platform Condition="'$(Platform)'==''">OSXARM64</Platform>
+        <Config Condition="'$(Config)'==''">Release</Config>
+        <Platform Condition="'$(Platform)'==''">Android64</Platform>
         <TargetedPlatforms>2790547</TargetedPlatforms>
         <AppType>Application</AppType>
         <MainSource>Vexed.dpr</MainSource>
@@ -89,6 +89,12 @@
     <PropertyGroup Condition="'$(Config)'=='Release' or '$(Cfg_2)'!=''">
         <Cfg_2>true</Cfg_2>
         <CfgParent>Base</CfgParent>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='Android64' and '$(Cfg_2)'=='true') or '$(Cfg_2_Android64)'!=''">
+        <Cfg_2_Android64>true</Cfg_2_Android64>
+        <CfgParent>Cfg_2</CfgParent>
+        <Cfg_2>true</Cfg_2>
         <Base>true</Base>
     </PropertyGroup>
     <PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Cfg_2)'=='true') or '$(Cfg_2_Win32)'!=''">
@@ -327,6 +333,19 @@
         <DCC_SymbolReferenceInfo>0</DCC_SymbolReferenceInfo>
         <DCC_DebugInformation>0</DCC_DebugInformation>
     </PropertyGroup>
+    <PropertyGroup Condition="'$(Cfg_2_Android64)'!=''">
+        <PF_KeyStore>E:\work\android.keystore</PF_KeyStore>
+        <PF_KeyStorePass>853847C05F950788CF7DE530D171E33F81850535A05F97C997AA0FF88E783C8ADB56A385E3111C2FC1E2577DFAC4C363BA95367E043722D3163A459DE5E4229DC938F341D558FA9BBFF8AF11</PF_KeyStorePass>
+        <PF_AliasKey>dev</PF_AliasKey>
+        <VerInfo_Build>1</VerInfo_Build>
+        <IncludeAndroid_AdaptiveIcon>true</IncludeAndroid_AdaptiveIcon>
+        <IncludeAndroid_VectorizedSplash>true</IncludeAndroid_VectorizedSplash>
+        <Android_BackgroundColor>#FFFFFF</Android_BackgroundColor>
+        <Android_DarkBackgroundColor>#000000</Android_DarkBackgroundColor>
+        <IncludeAndroid_NotificationAccentColor>false</IncludeAndroid_NotificationAccentColor>
+        <Android_NotificationAccentColor>#000000</Android_NotificationAccentColor>
+        <IncludeAndroid_VectorizedNotificationIcon>true</IncludeAndroid_VectorizedNotificationIcon>
+    </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2_Win32)'!=''">
         <AppDPIAwarenessMode>PerMonitorV2</AppDPIAwarenessMode>
     </PropertyGroup>
@@ -370,6 +389,12 @@
                 <Source>
                     <Source Name="MainSource">Vexed.dpr</Source>
                 </Source>
+                <Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\bcboffice2k370.bpl">Embarcadero C++Builder Office 2000 Servers Package</Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\bcbofficexp370.bpl">Embarcadero C++Builder Office XP Servers Package</Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\dcloffice2k370.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\dclofficexp370.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
+                </Excluded_Packages>
             </Delphi.Personality>
             <Deployment Version="5">
                 <DeployFile LocalName="$(BDS)\Redist\iossimulator\libcgunwind.1.0.dylib" Class="DependencyModule">
@@ -400,6 +425,388 @@
                         <RemoteDir>.\</RemoteDir>
                         <Operation>0</Operation>
                         <RemoteName>sk4d.dll</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Background.xml" Configuration="Debug" Class="Android_AdaptiveIconBackground">
+                    <Platform Name="Android64">
+                        <RemoteName>ic_launcher_background.xml</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Background.xml" Configuration="Release" Class="Android_AdaptiveIconBackground">
+                    <Platform Name="Android64">
+                        <RemoteName>ic_launcher_background.xml</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Foreground.xml" Configuration="Debug" Class="Android_AdaptiveIconForeground">
+                    <Platform Name="Android64">
+                        <RemoteName>ic_launcher_foreground.xml</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Foreground.xml" Configuration="Release" Class="Android_AdaptiveIconForeground">
+                    <Platform Name="Android64">
+                        <RemoteName>ic_launcher_foreground.xml</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Monochrome.xml" Configuration="Debug" Class="Android_AdaptiveIconMonochrome">
+                    <Platform Name="Android64">
+                        <RemoteName>ic_launcher_monochrome.xml</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Monochrome.xml" Configuration="Release" Class="Android_AdaptiveIconMonochrome">
+                    <Platform Name="Android64">
+                        <RemoteName>ic_launcher_monochrome.xml</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_144x144.png" Configuration="Debug" Class="Android_LauncherIcon144">
+                    <Platform Name="Android64">
+                        <RemoteName>ic_launcher.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_144x144.png" Configuration="Release" Class="Android_LauncherIcon144">
+                    <Platform Name="Android64">
+                        <RemoteName>ic_launcher.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_192x192.png" Configuration="Debug" Class="Android_LauncherIcon192">
+                    <Platform Name="Android64">
+                        <RemoteName>ic_launcher.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_192x192.png" Configuration="Release" Class="Android_LauncherIcon192">
+                    <Platform Name="Android64">
+                        <RemoteName>ic_launcher.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_36x36.png" Configuration="Debug" Class="Android_LauncherIcon36">
+                    <Platform Name="Android64">
+                        <RemoteName>ic_launcher.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_36x36.png" Configuration="Release" Class="Android_LauncherIcon36">
+                    <Platform Name="Android64">
+                        <RemoteName>ic_launcher.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_48x48.png" Configuration="Debug" Class="Android_LauncherIcon48">
+                    <Platform Name="Android64">
+                        <RemoteName>ic_launcher.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_48x48.png" Configuration="Release" Class="Android_LauncherIcon48">
+                    <Platform Name="Android64">
+                        <RemoteName>ic_launcher.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_72x72.png" Configuration="Debug" Class="Android_LauncherIcon72">
+                    <Platform Name="Android64">
+                        <RemoteName>ic_launcher.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_72x72.png" Configuration="Release" Class="Android_LauncherIcon72">
+                    <Platform Name="Android64">
+                        <RemoteName>ic_launcher.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_96x96.png" Configuration="Debug" Class="Android_LauncherIcon96">
+                    <Platform Name="Android64">
+                        <RemoteName>ic_launcher.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_96x96.png" Configuration="Release" Class="Android_LauncherIcon96">
+                    <Platform Name="Android64">
+                        <RemoteName>ic_launcher.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_NotificationIcon_24x24.png" Configuration="Debug" Class="Android_NotificationIcon24">
+                    <Platform Name="Android64">
+                        <RemoteName>ic_notification.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_NotificationIcon_24x24.png" Configuration="Release" Class="Android_NotificationIcon24">
+                    <Platform Name="Android64">
+                        <RemoteName>ic_notification.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_NotificationIcon_36x36.png" Configuration="Debug" Class="Android_NotificationIcon36">
+                    <Platform Name="Android64">
+                        <RemoteName>ic_notification.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_NotificationIcon_36x36.png" Configuration="Release" Class="Android_NotificationIcon36">
+                    <Platform Name="Android64">
+                        <RemoteName>ic_notification.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_NotificationIcon_48x48.png" Configuration="Debug" Class="Android_NotificationIcon48">
+                    <Platform Name="Android64">
+                        <RemoteName>ic_notification.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_NotificationIcon_48x48.png" Configuration="Release" Class="Android_NotificationIcon48">
+                    <Platform Name="Android64">
+                        <RemoteName>ic_notification.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_NotificationIcon_72x72.png" Configuration="Debug" Class="Android_NotificationIcon72">
+                    <Platform Name="Android64">
+                        <RemoteName>ic_notification.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_NotificationIcon_72x72.png" Configuration="Release" Class="Android_NotificationIcon72">
+                    <Platform Name="Android64">
+                        <RemoteName>ic_notification.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_NotificationIcon_96x96.png" Configuration="Debug" Class="Android_NotificationIcon96">
+                    <Platform Name="Android64">
+                        <RemoteName>ic_notification.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_NotificationIcon_96x96.png" Configuration="Release" Class="Android_NotificationIcon96">
+                    <Platform Name="Android64">
+                        <RemoteName>ic_notification.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_SplashImage_426x320.png" Configuration="Debug" Class="Android_SplashImage426">
+                    <Platform Name="Android64">
+                        <RemoteName>splash_image.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_SplashImage_426x320.png" Configuration="Release" Class="Android_SplashImage426">
+                    <Platform Name="Android64">
+                        <RemoteName>splash_image.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_SplashImage_470x320.png" Configuration="Debug" Class="Android_SplashImage470">
+                    <Platform Name="Android64">
+                        <RemoteName>splash_image.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_SplashImage_470x320.png" Configuration="Release" Class="Android_SplashImage470">
+                    <Platform Name="Android64">
+                        <RemoteName>splash_image.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_SplashImage_640x480.png" Configuration="Debug" Class="Android_SplashImage640">
+                    <Platform Name="Android64">
+                        <RemoteName>splash_image.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_SplashImage_640x480.png" Configuration="Release" Class="Android_SplashImage640">
+                    <Platform Name="Android64">
+                        <RemoteName>splash_image.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_SplashImage_960x720.png" Configuration="Debug" Class="Android_SplashImage960">
+                    <Platform Name="Android64">
+                        <RemoteName>splash_image.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_SplashImage_960x720.png" Configuration="Release" Class="Android_SplashImage960">
+                    <Platform Name="Android64">
+                        <RemoteName>splash_image.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedNotificationIcon.xml" Configuration="Debug" Class="Android_VectorizedNotificationIcon">
+                    <Platform Name="Android64">
+                        <RemoteName>ic_notification.xml</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedNotificationIcon.xml" Configuration="Release" Class="Android_VectorizedNotificationIcon">
+                    <Platform Name="Android64">
+                        <RemoteName>ic_notification.xml</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplash.xml" Configuration="Debug" Class="Android_VectorizedSplash">
+                    <Platform Name="Android64">
+                        <RemoteName>splash_vector.xml</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplash.xml" Configuration="Release" Class="Android_VectorizedSplash">
+                    <Platform Name="Android64">
+                        <RemoteName>splash_vector.xml</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashDark.xml" Configuration="Debug" Class="Android_VectorizedSplashDark">
+                    <Platform Name="Android64">
+                        <RemoteName>splash_vector.xml</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashDark.xml" Configuration="Release" Class="Android_VectorizedSplashDark">
+                    <Platform Name="Android64">
+                        <RemoteName>splash_vector.xml</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashV31.xml" Configuration="Debug" Class="Android_VectorizedSplashV31">
+                    <Platform Name="Android64">
+                        <RemoteName>splash_vector.xml</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashV31.xml" Configuration="Release" Class="Android_VectorizedSplashV31">
+                    <Platform Name="Android64">
+                        <RemoteName>splash_vector.xml</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashV31Dark.xml" Configuration="Debug" Class="Android_VectorizedSplashV31Dark">
+                    <Platform Name="Android64">
+                        <RemoteName>splash_vector.xml</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashV31Dark.xml" Configuration="Release" Class="Android_VectorizedSplashV31Dark">
+                    <Platform Name="Android64">
+                        <RemoteName>splash_vector.xml</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="$(BDS)\bin\Artwork\iOS\iPad\FM_ApplicationIcon_152x152.png" Configuration="Debug" Class="iPad_AppIcon152">
+                    <Platform Name="iOSDevice64">
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="$(BDS)\bin\Artwork\iOS\iPad\FM_ApplicationIcon_167x167.png" Configuration="Debug" Class="iPad_AppIcon167">
+                    <Platform Name="iOSDevice64">
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="$(BDS)\bin\Artwork\iOS\iPad\FM_LaunchImageDark_2x.png" Configuration="Debug" Class="iPad_LaunchDark2x">
+                    <Platform Name="iOSDevice64">
+                        <RemoteName>FM_LaunchScreenImage_iPadDark@2x.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="$(BDS)\bin\Artwork\iOS\iPad\FM_LaunchImage_2x.png" Configuration="Debug" Class="iPad_Launch2x">
+                    <Platform Name="iOSDevice64">
+                        <RemoteName>FM_LaunchScreenImage_iPad@2x.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="$(BDS)\bin\Artwork\iOS\iPad\FM_NotificationIcon_40x40.png" Configuration="Debug" Class="iPad_Notification40">
+                    <Platform Name="iOSDevice64">
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="$(BDS)\bin\Artwork\iOS\iPad\FM_SettingIcon_58x58.png" Configuration="Debug" Class="iPad_Setting58">
+                    <Platform Name="iOSDevice64">
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="$(BDS)\bin\Artwork\iOS\iPad\FM_SpotlightSearchIcon_80x80.png" Configuration="Debug" Class="iPad_SpotLight80">
+                    <Platform Name="iOSDevice64">
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="$(BDS)\bin\Artwork\iOS\iPhone\FM_ApplicationIcon_1024x1024.png" Configuration="Debug" Class="iOS_AppStore1024">
+                    <Platform Name="iOSDevice64">
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="$(BDS)\bin\Artwork\iOS\iPhone\FM_ApplicationIcon_120x120.png" Configuration="Debug" Class="iPhone_AppIcon120">
+                    <Platform Name="iOSDevice64">
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="$(BDS)\bin\Artwork\iOS\iPhone\FM_ApplicationIcon_180x180.png" Configuration="Debug" Class="iPhone_AppIcon180">
+                    <Platform Name="iOSDevice64">
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="$(BDS)\bin\Artwork\iOS\iPhone\FM_LaunchImageDark_2x.png" Configuration="Debug" Class="iPhone_LaunchDark2x">
+                    <Platform Name="iOSDevice64">
+                        <RemoteName>FM_LaunchScreenImage_iPhoneDark@2x.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="$(BDS)\bin\Artwork\iOS\iPhone\FM_LaunchImageDark_3x.png" Configuration="Debug" Class="iPhone_LaunchDark3x">
+                    <Platform Name="iOSDevice64">
+                        <RemoteName>FM_LaunchScreenImage_iPhoneDark@3x.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="$(BDS)\bin\Artwork\iOS\iPhone\FM_LaunchImage_2x.png" Configuration="Debug" Class="iPhone_Launch2x">
+                    <Platform Name="iOSDevice64">
+                        <RemoteName>FM_LaunchScreenImage_iPhone@2x.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="$(BDS)\bin\Artwork\iOS\iPhone\FM_LaunchImage_3x.png" Configuration="Debug" Class="iPhone_Launch3x">
+                    <Platform Name="iOSDevice64">
+                        <RemoteName>FM_LaunchScreenImage_iPhone@3x.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="$(BDS)\bin\Artwork\iOS\iPhone\FM_NotificationIcon_40x40.png" Configuration="Debug" Class="iPhone_Notification40">
+                    <Platform Name="iOSDevice64">
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="$(BDS)\bin\Artwork\iOS\iPhone\FM_NotificationIcon_60x60.png" Configuration="Debug" Class="iPhone_Notification60">
+                    <Platform Name="iOSDevice64">
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="$(BDS)\bin\Artwork\iOS\iPhone\FM_SettingIcon_58x58.png" Configuration="Debug" Class="iPhone_Setting58">
+                    <Platform Name="iOSDevice64">
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="$(BDS)\bin\Artwork\iOS\iPhone\FM_SettingIcon_87x87.png" Configuration="Debug" Class="iPhone_Setting87">
+                    <Platform Name="iOSDevice64">
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="$(BDS)\bin\Artwork\iOS\iPhone\FM_SpotlightSearchIcon_120x120.png" Configuration="Debug" Class="iPhone_Spotlight120">
+                    <Platform Name="iOSDevice64">
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="$(BDS)\bin\Artwork\iOS\iPhone\FM_SpotlightSearchIcon_80x80.png" Configuration="Debug" Class="iPhone_Spotlight80">
+                    <Platform Name="iOSDevice64">
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
@@ -475,6 +882,42 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
+                <DeployFile LocalName="$(BDS)\lib\android\debug\armeabi-v7a\libnative-activity.so" Configuration="Debug" Class="AndroidLibnativeArmeabiv7aFile">
+                    <Platform Name="Android64">
+                        <RemoteName>libVexed.so</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="$(BDS)\lib\android\debug\armeabi-v7a\libnative-activity.so" Configuration="Release" Class="AndroidLibnativeArmeabiv7aFile">
+                    <Platform Name="Android64">
+                        <RemoteName>libVexed.so</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="$(BDS)\lib\android\debug\armeabi\libnative-activity.so" Configuration="Debug" Class="AndroidLibnativeArmeabiFile">
+                    <Platform Name="Android64">
+                        <RemoteName>libVexed.so</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="$(BDS)\lib\android\debug\armeabi\libnative-activity.so" Configuration="Release" Class="AndroidLibnativeArmeabiFile">
+                    <Platform Name="Android64">
+                        <RemoteName>libVexed.so</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="$(BDS)\lib\android\debug\mips\libnative-activity.so" Configuration="Debug" Class="AndroidLibnativeMipsFile">
+                    <Platform Name="Android64">
+                        <RemoteName>libVexed.so</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="$(BDS)\lib\android\debug\mips\libnative-activity.so" Configuration="Release" Class="AndroidLibnativeMipsFile">
+                    <Platform Name="Android64">
+                        <RemoteName>libVexed.so</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
                 <DeployFile Condition="'$(SKIADIR)'!=''" Required="true" LocalName="$(SKIADIR)\Binary\Shared\Linux64\libsk4d.so" Configuration="Debug" Class="Skia">
                     <Platform Name="Linux64">
                         <RemoteDir>.\</RemoteDir>
@@ -536,6 +979,150 @@
                         <RemoteDir>.\</RemoteDir>
                         <Operation>0</Operation>
                         <RemoteName>sk4d.dll</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="Android64\Debug\AndroidManifest.xml" Configuration="Debug" Class="ProjectAndroidManifest">
+                    <Platform Name="Android64">
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="Android64\Debug\colors-night-v21.xml" Configuration="Debug" Class="Android_ColorsDark">
+                    <Platform Name="Android64">
+                        <RemoteName>colors.xml</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="Android64\Debug\colors.xml" Configuration="Debug" Class="Android_Colors">
+                    <Platform Name="Android64">
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="Android64\Debug\ic_launcher-v33.xml" Configuration="Debug" Class="Android_AdaptiveIconV33">
+                    <Platform Name="Android64">
+                        <RemoteName>ic_launcher.xml</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="Android64\Debug\ic_launcher.xml" Configuration="Debug" Class="Android_AdaptiveIcon">
+                    <Platform Name="Android64">
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="Android64\Debug\libVexed.so" Configuration="Debug" Class="ProjectOutput">
+                    <Platform Name="Android64">
+                        <RemoteName>libVexed.so</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="Android64\Debug\splash_image_def-v21.xml" Configuration="Debug" Class="AndroidSplashImageDefV21">
+                    <Platform Name="Android64">
+                        <RemoteName>splash_image_def.xml</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="Android64\Debug\splash_image_def.xml" Configuration="Debug" Class="AndroidSplashImageDef">
+                    <Platform Name="Android64">
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="Android64\Debug\strings.xml" Configuration="Debug" Class="Android_Strings">
+                    <Platform Name="Android64">
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="Android64\Debug\styles-v21.xml" Configuration="Debug" Class="AndroidSplashStylesV21">
+                    <Platform Name="Android64">
+                        <RemoteName>styles.xml</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="Android64\Debug\styles-v31.xml" Configuration="Debug" Class="AndroidSplashStylesV31">
+                    <Platform Name="Android64">
+                        <RemoteName>styles.xml</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="Android64\Debug\styles-v35.xml" Configuration="Debug" Class="AndroidSplashStylesV35">
+                    <Platform Name="Android64">
+                        <RemoteName>styles.xml</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="Android64\Debug\styles.xml" Configuration="Debug" Class="AndroidSplashStyles">
+                    <Platform Name="Android64">
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="Android64\Release\AndroidManifest.xml" Configuration="Release" Class="ProjectAndroidManifest">
+                    <Platform Name="Android64">
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="Android64\Release\colors-night-v21.xml" Configuration="Release" Class="Android_ColorsDark">
+                    <Platform Name="Android64">
+                        <RemoteName>colors.xml</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="Android64\Release\colors.xml" Configuration="Release" Class="Android_Colors">
+                    <Platform Name="Android64">
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="Android64\Release\ic_launcher-v33.xml" Configuration="Release" Class="Android_AdaptiveIconV33">
+                    <Platform Name="Android64">
+                        <RemoteName>ic_launcher.xml</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="Android64\Release\ic_launcher.xml" Configuration="Release" Class="Android_AdaptiveIcon">
+                    <Platform Name="Android64">
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="Android64\Release\libVexed.so" Configuration="Release" Class="ProjectOutput">
+                    <Platform Name="Android64">
+                        <RemoteName>libVexed.so</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="Android64\Release\splash_image_def-v21.xml" Configuration="Release" Class="AndroidSplashImageDefV21">
+                    <Platform Name="Android64">
+                        <RemoteName>splash_image_def.xml</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="Android64\Release\splash_image_def.xml" Configuration="Release" Class="AndroidSplashImageDef">
+                    <Platform Name="Android64">
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="Android64\Release\strings.xml" Configuration="Release" Class="Android_Strings">
+                    <Platform Name="Android64">
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="Android64\Release\styles-v21.xml" Configuration="Release" Class="AndroidSplashStylesV21">
+                    <Platform Name="Android64">
+                        <RemoteName>styles.xml</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="Android64\Release\styles-v31.xml" Configuration="Release" Class="AndroidSplashStylesV31">
+                    <Platform Name="Android64">
+                        <RemoteName>styles.xml</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="Android64\Release\styles-v35.xml" Configuration="Release" Class="AndroidSplashStylesV35">
+                    <Platform Name="Android64">
+                        <RemoteName>styles.xml</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="Android64\Release\styles.xml" Configuration="Release" Class="AndroidSplashStyles">
+                    <Platform Name="Android64">
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
@@ -638,8 +1225,22 @@
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="assets\images\blank.png" Configuration="Debug" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\images\</RemoteDir>
+                        <RemoteName>blank.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\images\blank.png" Configuration="Debug" Class="File">
                     <Platform Name="OSXARM64">
                         <RemoteDir>Contents\Resources\assets\images\</RemoteDir>
+                        <RemoteName>blank.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\images\blank.png" Configuration="Release" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\images\</RemoteDir>
                         <RemoteName>blank.png</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
@@ -652,8 +1253,22 @@
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="assets\images\celtic\tile1.png" Configuration="Debug" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\images\celtic\</RemoteDir>
+                        <RemoteName>tile1.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\images\celtic\tile1.png" Configuration="Debug" Class="File">
                     <Platform Name="OSXARM64">
                         <RemoteDir>Contents\Resources\assets\images\celtic\</RemoteDir>
+                        <RemoteName>tile1.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\images\celtic\tile1.png" Configuration="Release" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\images\celtic\</RemoteDir>
                         <RemoteName>tile1.png</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
@@ -666,8 +1281,22 @@
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="assets\images\celtic\tile2.png" Configuration="Debug" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\images\celtic\</RemoteDir>
+                        <RemoteName>tile2.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\images\celtic\tile2.png" Configuration="Debug" Class="File">
                     <Platform Name="OSXARM64">
                         <RemoteDir>Contents\Resources\assets\images\celtic\</RemoteDir>
+                        <RemoteName>tile2.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\images\celtic\tile2.png" Configuration="Release" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\images\celtic\</RemoteDir>
                         <RemoteName>tile2.png</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
@@ -680,8 +1309,22 @@
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="assets\images\celtic\tile3.png" Configuration="Debug" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\images\celtic\</RemoteDir>
+                        <RemoteName>tile3.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\images\celtic\tile3.png" Configuration="Debug" Class="File">
                     <Platform Name="OSXARM64">
                         <RemoteDir>Contents\Resources\assets\images\celtic\</RemoteDir>
+                        <RemoteName>tile3.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\images\celtic\tile3.png" Configuration="Release" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\images\celtic\</RemoteDir>
                         <RemoteName>tile3.png</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
@@ -694,8 +1337,22 @@
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="assets\images\celtic\tile4.png" Configuration="Debug" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\images\celtic\</RemoteDir>
+                        <RemoteName>tile4.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\images\celtic\tile4.png" Configuration="Debug" Class="File">
                     <Platform Name="OSXARM64">
                         <RemoteDir>Contents\Resources\assets\images\celtic\</RemoteDir>
+                        <RemoteName>tile4.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\images\celtic\tile4.png" Configuration="Release" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\images\celtic\</RemoteDir>
                         <RemoteName>tile4.png</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
@@ -708,8 +1365,22 @@
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="assets\images\celtic\tile5.png" Configuration="Debug" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\images\celtic\</RemoteDir>
+                        <RemoteName>tile5.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\images\celtic\tile5.png" Configuration="Debug" Class="File">
                     <Platform Name="OSXARM64">
                         <RemoteDir>Contents\Resources\assets\images\celtic\</RemoteDir>
+                        <RemoteName>tile5.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\images\celtic\tile5.png" Configuration="Release" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\images\celtic\</RemoteDir>
                         <RemoteName>tile5.png</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
@@ -722,8 +1393,22 @@
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="assets\images\celtic\tile6.png" Configuration="Debug" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\images\celtic\</RemoteDir>
+                        <RemoteName>tile6.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\images\celtic\tile6.png" Configuration="Debug" Class="File">
                     <Platform Name="OSXARM64">
                         <RemoteDir>Contents\Resources\assets\images\celtic\</RemoteDir>
+                        <RemoteName>tile6.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\images\celtic\tile6.png" Configuration="Release" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\images\celtic\</RemoteDir>
                         <RemoteName>tile6.png</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
@@ -736,8 +1421,22 @@
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="assets\images\celtic\tile7.png" Configuration="Debug" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\images\celtic\</RemoteDir>
+                        <RemoteName>tile7.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\images\celtic\tile7.png" Configuration="Debug" Class="File">
                     <Platform Name="OSXARM64">
                         <RemoteDir>Contents\Resources\assets\images\celtic\</RemoteDir>
+                        <RemoteName>tile7.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\images\celtic\tile7.png" Configuration="Release" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\images\celtic\</RemoteDir>
                         <RemoteName>tile7.png</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
@@ -750,8 +1449,22 @@
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="assets\images\celtic\tile8.png" Configuration="Debug" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\images\celtic\</RemoteDir>
+                        <RemoteName>tile8.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\images\celtic\tile8.png" Configuration="Debug" Class="File">
                     <Platform Name="OSXARM64">
                         <RemoteDir>Contents\Resources\assets\images\celtic\</RemoteDir>
+                        <RemoteName>tile8.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\images\celtic\tile8.png" Configuration="Release" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\images\celtic\</RemoteDir>
                         <RemoteName>tile8.png</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
@@ -764,8 +1477,22 @@
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="assets\images\chinese\tile1.png" Configuration="Debug" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\images\chinese\</RemoteDir>
+                        <RemoteName>tile1.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\images\chinese\tile1.png" Configuration="Debug" Class="File">
                     <Platform Name="OSXARM64">
                         <RemoteDir>Contents\Resources\assets\images\chinese\</RemoteDir>
+                        <RemoteName>tile1.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\images\chinese\tile1.png" Configuration="Release" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\images\chinese\</RemoteDir>
                         <RemoteName>tile1.png</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
@@ -778,8 +1505,22 @@
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="assets\images\chinese\tile2.png" Configuration="Debug" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\images\chinese\</RemoteDir>
+                        <RemoteName>tile2.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\images\chinese\tile2.png" Configuration="Debug" Class="File">
                     <Platform Name="OSXARM64">
                         <RemoteDir>Contents\Resources\assets\images\chinese\</RemoteDir>
+                        <RemoteName>tile2.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\images\chinese\tile2.png" Configuration="Release" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\images\chinese\</RemoteDir>
                         <RemoteName>tile2.png</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
@@ -792,8 +1533,22 @@
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="assets\images\chinese\tile3.png" Configuration="Debug" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\images\chinese\</RemoteDir>
+                        <RemoteName>tile3.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\images\chinese\tile3.png" Configuration="Debug" Class="File">
                     <Platform Name="OSXARM64">
                         <RemoteDir>Contents\Resources\assets\images\chinese\</RemoteDir>
+                        <RemoteName>tile3.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\images\chinese\tile3.png" Configuration="Release" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\images\chinese\</RemoteDir>
                         <RemoteName>tile3.png</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
@@ -806,8 +1561,22 @@
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="assets\images\chinese\tile4.png" Configuration="Debug" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\images\chinese\</RemoteDir>
+                        <RemoteName>tile4.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\images\chinese\tile4.png" Configuration="Debug" Class="File">
                     <Platform Name="OSXARM64">
                         <RemoteDir>Contents\Resources\assets\images\chinese\</RemoteDir>
+                        <RemoteName>tile4.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\images\chinese\tile4.png" Configuration="Release" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\images\chinese\</RemoteDir>
                         <RemoteName>tile4.png</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
@@ -820,8 +1589,22 @@
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="assets\images\chinese\tile5.png" Configuration="Debug" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\images\chinese\</RemoteDir>
+                        <RemoteName>tile5.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\images\chinese\tile5.png" Configuration="Debug" Class="File">
                     <Platform Name="OSXARM64">
                         <RemoteDir>Contents\Resources\assets\images\chinese\</RemoteDir>
+                        <RemoteName>tile5.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\images\chinese\tile5.png" Configuration="Release" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\images\chinese\</RemoteDir>
                         <RemoteName>tile5.png</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
@@ -834,8 +1617,22 @@
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="assets\images\chinese\tile6.png" Configuration="Debug" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\images\chinese\</RemoteDir>
+                        <RemoteName>tile6.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\images\chinese\tile6.png" Configuration="Debug" Class="File">
                     <Platform Name="OSXARM64">
                         <RemoteDir>Contents\Resources\assets\images\chinese\</RemoteDir>
+                        <RemoteName>tile6.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\images\chinese\tile6.png" Configuration="Release" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\images\chinese\</RemoteDir>
                         <RemoteName>tile6.png</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
@@ -848,8 +1645,22 @@
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="assets\images\chinese\tile7.png" Configuration="Debug" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\images\chinese\</RemoteDir>
+                        <RemoteName>tile7.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\images\chinese\tile7.png" Configuration="Debug" Class="File">
                     <Platform Name="OSXARM64">
                         <RemoteDir>Contents\Resources\assets\images\chinese\</RemoteDir>
+                        <RemoteName>tile7.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\images\chinese\tile7.png" Configuration="Release" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\images\chinese\</RemoteDir>
                         <RemoteName>tile7.png</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
@@ -862,8 +1673,22 @@
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="assets\images\chinese\tile8.png" Configuration="Debug" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\images\chinese\</RemoteDir>
+                        <RemoteName>tile8.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\images\chinese\tile8.png" Configuration="Debug" Class="File">
                     <Platform Name="OSXARM64">
                         <RemoteDir>Contents\Resources\assets\images\chinese\</RemoteDir>
+                        <RemoteName>tile8.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\images\chinese\tile8.png" Configuration="Release" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\images\chinese\</RemoteDir>
                         <RemoteName>tile8.png</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
@@ -876,8 +1701,22 @@
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="assets\images\classic\tile1.png" Configuration="Debug" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\images\classic\</RemoteDir>
+                        <RemoteName>tile1.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\images\classic\tile1.png" Configuration="Debug" Class="File">
                     <Platform Name="OSXARM64">
                         <RemoteDir>Contents\Resources\assets\images\classic\</RemoteDir>
+                        <RemoteName>tile1.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\images\classic\tile1.png" Configuration="Release" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\images\classic\</RemoteDir>
                         <RemoteName>tile1.png</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
@@ -890,8 +1729,22 @@
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="assets\images\classic\tile2.png" Configuration="Debug" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\images\classic\</RemoteDir>
+                        <RemoteName>tile2.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\images\classic\tile2.png" Configuration="Debug" Class="File">
                     <Platform Name="OSXARM64">
                         <RemoteDir>Contents\Resources\assets\images\classic\</RemoteDir>
+                        <RemoteName>tile2.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\images\classic\tile2.png" Configuration="Release" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\images\classic\</RemoteDir>
                         <RemoteName>tile2.png</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
@@ -904,8 +1757,22 @@
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="assets\images\classic\tile3.png" Configuration="Debug" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\images\classic\</RemoteDir>
+                        <RemoteName>tile3.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\images\classic\tile3.png" Configuration="Debug" Class="File">
                     <Platform Name="OSXARM64">
                         <RemoteDir>Contents\Resources\assets\images\classic\</RemoteDir>
+                        <RemoteName>tile3.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\images\classic\tile3.png" Configuration="Release" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\images\classic\</RemoteDir>
                         <RemoteName>tile3.png</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
@@ -918,8 +1785,22 @@
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="assets\images\classic\tile4.png" Configuration="Debug" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\images\classic\</RemoteDir>
+                        <RemoteName>tile4.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\images\classic\tile4.png" Configuration="Debug" Class="File">
                     <Platform Name="OSXARM64">
                         <RemoteDir>Contents\Resources\assets\images\classic\</RemoteDir>
+                        <RemoteName>tile4.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\images\classic\tile4.png" Configuration="Release" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\images\classic\</RemoteDir>
                         <RemoteName>tile4.png</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
@@ -932,8 +1813,22 @@
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="assets\images\classic\tile5.png" Configuration="Debug" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\images\classic\</RemoteDir>
+                        <RemoteName>tile5.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\images\classic\tile5.png" Configuration="Debug" Class="File">
                     <Platform Name="OSXARM64">
                         <RemoteDir>Contents\Resources\assets\images\classic\</RemoteDir>
+                        <RemoteName>tile5.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\images\classic\tile5.png" Configuration="Release" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\images\classic\</RemoteDir>
                         <RemoteName>tile5.png</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
@@ -946,8 +1841,22 @@
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="assets\images\classic\tile6.png" Configuration="Debug" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\images\classic\</RemoteDir>
+                        <RemoteName>tile6.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\images\classic\tile6.png" Configuration="Debug" Class="File">
                     <Platform Name="OSXARM64">
                         <RemoteDir>Contents\Resources\assets\images\classic\</RemoteDir>
+                        <RemoteName>tile6.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\images\classic\tile6.png" Configuration="Release" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\images\classic\</RemoteDir>
                         <RemoteName>tile6.png</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
@@ -960,8 +1869,22 @@
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="assets\images\classic\tile7.png" Configuration="Debug" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\images\classic\</RemoteDir>
+                        <RemoteName>tile7.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\images\classic\tile7.png" Configuration="Debug" Class="File">
                     <Platform Name="OSXARM64">
                         <RemoteDir>Contents\Resources\assets\images\classic\</RemoteDir>
+                        <RemoteName>tile7.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\images\classic\tile7.png" Configuration="Release" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\images\classic\</RemoteDir>
                         <RemoteName>tile7.png</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
@@ -974,8 +1897,22 @@
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="assets\images\classic\tile8.png" Configuration="Debug" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\images\classic\</RemoteDir>
+                        <RemoteName>tile8.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\images\classic\tile8.png" Configuration="Debug" Class="File">
                     <Platform Name="OSXARM64">
                         <RemoteDir>Contents\Resources\assets\images\classic\</RemoteDir>
+                        <RemoteName>tile8.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\images\classic\tile8.png" Configuration="Release" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\images\classic\</RemoteDir>
                         <RemoteName>tile8.png</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
@@ -988,8 +1925,22 @@
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="assets\images\computer\tile1.png" Configuration="Debug" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\images\computer\</RemoteDir>
+                        <RemoteName>tile1.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\images\computer\tile1.png" Configuration="Debug" Class="File">
                     <Platform Name="OSXARM64">
                         <RemoteDir>Contents\Resources\assets\images\computer\</RemoteDir>
+                        <RemoteName>tile1.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\images\computer\tile1.png" Configuration="Release" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\images\computer\</RemoteDir>
                         <RemoteName>tile1.png</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
@@ -1002,8 +1953,22 @@
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="assets\images\computer\tile2.png" Configuration="Debug" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\images\computer\</RemoteDir>
+                        <RemoteName>tile2.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\images\computer\tile2.png" Configuration="Debug" Class="File">
                     <Platform Name="OSXARM64">
                         <RemoteDir>Contents\Resources\assets\images\computer\</RemoteDir>
+                        <RemoteName>tile2.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\images\computer\tile2.png" Configuration="Release" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\images\computer\</RemoteDir>
                         <RemoteName>tile2.png</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
@@ -1016,8 +1981,22 @@
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="assets\images\computer\tile3.png" Configuration="Debug" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\images\computer\</RemoteDir>
+                        <RemoteName>tile3.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\images\computer\tile3.png" Configuration="Debug" Class="File">
                     <Platform Name="OSXARM64">
                         <RemoteDir>Contents\Resources\assets\images\computer\</RemoteDir>
+                        <RemoteName>tile3.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\images\computer\tile3.png" Configuration="Release" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\images\computer\</RemoteDir>
                         <RemoteName>tile3.png</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
@@ -1030,8 +2009,22 @@
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="assets\images\computer\tile4.png" Configuration="Debug" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\images\computer\</RemoteDir>
+                        <RemoteName>tile4.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\images\computer\tile4.png" Configuration="Debug" Class="File">
                     <Platform Name="OSXARM64">
                         <RemoteDir>Contents\Resources\assets\images\computer\</RemoteDir>
+                        <RemoteName>tile4.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\images\computer\tile4.png" Configuration="Release" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\images\computer\</RemoteDir>
                         <RemoteName>tile4.png</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
@@ -1044,8 +2037,22 @@
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="assets\images\computer\tile5.png" Configuration="Debug" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\images\computer\</RemoteDir>
+                        <RemoteName>tile5.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\images\computer\tile5.png" Configuration="Debug" Class="File">
                     <Platform Name="OSXARM64">
                         <RemoteDir>Contents\Resources\assets\images\computer\</RemoteDir>
+                        <RemoteName>tile5.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\images\computer\tile5.png" Configuration="Release" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\images\computer\</RemoteDir>
                         <RemoteName>tile5.png</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
@@ -1058,8 +2065,22 @@
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="assets\images\computer\tile6.png" Configuration="Debug" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\images\computer\</RemoteDir>
+                        <RemoteName>tile6.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\images\computer\tile6.png" Configuration="Debug" Class="File">
                     <Platform Name="OSXARM64">
                         <RemoteDir>Contents\Resources\assets\images\computer\</RemoteDir>
+                        <RemoteName>tile6.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\images\computer\tile6.png" Configuration="Release" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\images\computer\</RemoteDir>
                         <RemoteName>tile6.png</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
@@ -1072,8 +2093,22 @@
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="assets\images\computer\tile7.png" Configuration="Debug" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\images\computer\</RemoteDir>
+                        <RemoteName>tile7.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\images\computer\tile7.png" Configuration="Debug" Class="File">
                     <Platform Name="OSXARM64">
                         <RemoteDir>Contents\Resources\assets\images\computer\</RemoteDir>
+                        <RemoteName>tile7.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\images\computer\tile7.png" Configuration="Release" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\images\computer\</RemoteDir>
                         <RemoteName>tile7.png</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
@@ -1086,8 +2121,22 @@
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="assets\images\computer\tile8.png" Configuration="Debug" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\images\computer\</RemoteDir>
+                        <RemoteName>tile8.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\images\computer\tile8.png" Configuration="Debug" Class="File">
                     <Platform Name="OSXARM64">
                         <RemoteDir>Contents\Resources\assets\images\computer\</RemoteDir>
+                        <RemoteName>tile8.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\images\computer\tile8.png" Configuration="Release" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\images\computer\</RemoteDir>
                         <RemoteName>tile8.png</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
@@ -1100,8 +2149,22 @@
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="assets\images\egyptian\tile1.png" Configuration="Debug" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\images\egyptian\</RemoteDir>
+                        <RemoteName>tile1.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\images\egyptian\tile1.png" Configuration="Debug" Class="File">
                     <Platform Name="OSXARM64">
                         <RemoteDir>Contents\Resources\assets\images\egyptian\</RemoteDir>
+                        <RemoteName>tile1.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\images\egyptian\tile1.png" Configuration="Release" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\images\egyptian\</RemoteDir>
                         <RemoteName>tile1.png</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
@@ -1114,8 +2177,22 @@
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="assets\images\egyptian\tile2.png" Configuration="Debug" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\images\egyptian\</RemoteDir>
+                        <RemoteName>tile2.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\images\egyptian\tile2.png" Configuration="Debug" Class="File">
                     <Platform Name="OSXARM64">
                         <RemoteDir>Contents\Resources\assets\images\egyptian\</RemoteDir>
+                        <RemoteName>tile2.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\images\egyptian\tile2.png" Configuration="Release" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\images\egyptian\</RemoteDir>
                         <RemoteName>tile2.png</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
@@ -1128,8 +2205,22 @@
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="assets\images\egyptian\tile3.png" Configuration="Debug" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\images\egyptian\</RemoteDir>
+                        <RemoteName>tile3.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\images\egyptian\tile3.png" Configuration="Debug" Class="File">
                     <Platform Name="OSXARM64">
                         <RemoteDir>Contents\Resources\assets\images\egyptian\</RemoteDir>
+                        <RemoteName>tile3.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\images\egyptian\tile3.png" Configuration="Release" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\images\egyptian\</RemoteDir>
                         <RemoteName>tile3.png</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
@@ -1142,8 +2233,22 @@
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="assets\images\egyptian\tile4.png" Configuration="Debug" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\images\egyptian\</RemoteDir>
+                        <RemoteName>tile4.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\images\egyptian\tile4.png" Configuration="Debug" Class="File">
                     <Platform Name="OSXARM64">
                         <RemoteDir>Contents\Resources\assets\images\egyptian\</RemoteDir>
+                        <RemoteName>tile4.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\images\egyptian\tile4.png" Configuration="Release" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\images\egyptian\</RemoteDir>
                         <RemoteName>tile4.png</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
@@ -1156,8 +2261,22 @@
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="assets\images\egyptian\tile5.png" Configuration="Debug" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\images\egyptian\</RemoteDir>
+                        <RemoteName>tile5.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\images\egyptian\tile5.png" Configuration="Debug" Class="File">
                     <Platform Name="OSXARM64">
                         <RemoteDir>Contents\Resources\assets\images\egyptian\</RemoteDir>
+                        <RemoteName>tile5.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\images\egyptian\tile5.png" Configuration="Release" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\images\egyptian\</RemoteDir>
                         <RemoteName>tile5.png</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
@@ -1170,8 +2289,22 @@
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="assets\images\egyptian\tile6.png" Configuration="Debug" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\images\egyptian\</RemoteDir>
+                        <RemoteName>tile6.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\images\egyptian\tile6.png" Configuration="Debug" Class="File">
                     <Platform Name="OSXARM64">
                         <RemoteDir>Contents\Resources\assets\images\egyptian\</RemoteDir>
+                        <RemoteName>tile6.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\images\egyptian\tile6.png" Configuration="Release" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\images\egyptian\</RemoteDir>
                         <RemoteName>tile6.png</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
@@ -1184,8 +2317,22 @@
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="assets\images\egyptian\tile7.png" Configuration="Debug" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\images\egyptian\</RemoteDir>
+                        <RemoteName>tile7.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\images\egyptian\tile7.png" Configuration="Debug" Class="File">
                     <Platform Name="OSXARM64">
                         <RemoteDir>Contents\Resources\assets\images\egyptian\</RemoteDir>
+                        <RemoteName>tile7.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\images\egyptian\tile7.png" Configuration="Release" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\images\egyptian\</RemoteDir>
                         <RemoteName>tile7.png</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
@@ -1198,8 +2345,22 @@
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="assets\images\egyptian\tile8.png" Configuration="Debug" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\images\egyptian\</RemoteDir>
+                        <RemoteName>tile8.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\images\egyptian\tile8.png" Configuration="Debug" Class="File">
                     <Platform Name="OSXARM64">
                         <RemoteDir>Contents\Resources\assets\images\egyptian\</RemoteDir>
+                        <RemoteName>tile8.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\images\egyptian\tile8.png" Configuration="Release" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\images\egyptian\</RemoteDir>
                         <RemoteName>tile8.png</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
@@ -1212,8 +2373,22 @@
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="assets\images\mayan\tile1.png" Configuration="Debug" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\images\mayan\</RemoteDir>
+                        <RemoteName>tile1.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\images\mayan\tile1.png" Configuration="Debug" Class="File">
                     <Platform Name="OSXARM64">
                         <RemoteDir>Contents\Resources\assets\images\mayan\</RemoteDir>
+                        <RemoteName>tile1.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\images\mayan\tile1.png" Configuration="Release" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\images\mayan\</RemoteDir>
                         <RemoteName>tile1.png</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
@@ -1226,8 +2401,22 @@
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="assets\images\mayan\tile2.png" Configuration="Debug" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\images\mayan\</RemoteDir>
+                        <RemoteName>tile2.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\images\mayan\tile2.png" Configuration="Debug" Class="File">
                     <Platform Name="OSXARM64">
                         <RemoteDir>Contents\Resources\assets\images\mayan\</RemoteDir>
+                        <RemoteName>tile2.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\images\mayan\tile2.png" Configuration="Release" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\images\mayan\</RemoteDir>
                         <RemoteName>tile2.png</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
@@ -1240,8 +2429,22 @@
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="assets\images\mayan\tile3.png" Configuration="Debug" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\images\mayan\</RemoteDir>
+                        <RemoteName>tile3.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\images\mayan\tile3.png" Configuration="Debug" Class="File">
                     <Platform Name="OSXARM64">
                         <RemoteDir>Contents\Resources\assets\images\mayan\</RemoteDir>
+                        <RemoteName>tile3.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\images\mayan\tile3.png" Configuration="Release" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\images\mayan\</RemoteDir>
                         <RemoteName>tile3.png</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
@@ -1254,8 +2457,22 @@
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="assets\images\mayan\tile4.png" Configuration="Debug" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\images\mayan\</RemoteDir>
+                        <RemoteName>tile4.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\images\mayan\tile4.png" Configuration="Debug" Class="File">
                     <Platform Name="OSXARM64">
                         <RemoteDir>Contents\Resources\assets\images\mayan\</RemoteDir>
+                        <RemoteName>tile4.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\images\mayan\tile4.png" Configuration="Release" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\images\mayan\</RemoteDir>
                         <RemoteName>tile4.png</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
@@ -1268,8 +2485,22 @@
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="assets\images\mayan\tile5.png" Configuration="Debug" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\images\mayan\</RemoteDir>
+                        <RemoteName>tile5.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\images\mayan\tile5.png" Configuration="Debug" Class="File">
                     <Platform Name="OSXARM64">
                         <RemoteDir>Contents\Resources\assets\images\mayan\</RemoteDir>
+                        <RemoteName>tile5.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\images\mayan\tile5.png" Configuration="Release" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\images\mayan\</RemoteDir>
                         <RemoteName>tile5.png</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
@@ -1282,8 +2513,22 @@
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="assets\images\mayan\tile6.png" Configuration="Debug" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\images\mayan\</RemoteDir>
+                        <RemoteName>tile6.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\images\mayan\tile6.png" Configuration="Debug" Class="File">
                     <Platform Name="OSXARM64">
                         <RemoteDir>Contents\Resources\assets\images\mayan\</RemoteDir>
+                        <RemoteName>tile6.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\images\mayan\tile6.png" Configuration="Release" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\images\mayan\</RemoteDir>
                         <RemoteName>tile6.png</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
@@ -1296,8 +2541,22 @@
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="assets\images\mayan\tile7.png" Configuration="Debug" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\images\mayan\</RemoteDir>
+                        <RemoteName>tile7.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\images\mayan\tile7.png" Configuration="Debug" Class="File">
                     <Platform Name="OSXARM64">
                         <RemoteDir>Contents\Resources\assets\images\mayan\</RemoteDir>
+                        <RemoteName>tile7.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\images\mayan\tile7.png" Configuration="Release" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\images\mayan\</RemoteDir>
                         <RemoteName>tile7.png</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
@@ -1310,8 +2569,22 @@
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="assets\images\mayan\tile8.png" Configuration="Debug" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\images\mayan\</RemoteDir>
+                        <RemoteName>tile8.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\images\mayan\tile8.png" Configuration="Debug" Class="File">
                     <Platform Name="OSXARM64">
                         <RemoteDir>Contents\Resources\assets\images\mayan\</RemoteDir>
+                        <RemoteName>tile8.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\images\mayan\tile8.png" Configuration="Release" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\images\mayan\</RemoteDir>
                         <RemoteName>tile8.png</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
@@ -1324,8 +2597,22 @@
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="assets\images\wall.png" Configuration="Debug" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\images\</RemoteDir>
+                        <RemoteName>wall.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\images\wall.png" Configuration="Debug" Class="File">
                     <Platform Name="OSXARM64">
                         <RemoteDir>Contents\Resources\assets\images\</RemoteDir>
+                        <RemoteName>wall.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\images\wall.png" Configuration="Release" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\images\</RemoteDir>
                         <RemoteName>wall.png</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
@@ -1338,8 +2625,22 @@
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="assets\levels\Children's Pack.pdb" Configuration="Debug" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\levels\</RemoteDir>
+                        <RemoteName>Children&apos;s Pack.pdb</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\levels\Children's Pack.pdb" Configuration="Debug" Class="File">
                     <Platform Name="OSXARM64">
                         <RemoteDir>Contents\Resources\assets\levels\</RemoteDir>
+                        <RemoteName>Children&apos;s Pack.pdb</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\levels\Children's Pack.pdb" Configuration="Release" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\levels\</RemoteDir>
                         <RemoteName>Children&apos;s Pack.pdb</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
@@ -1352,8 +2653,22 @@
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="assets\levels\Classic II Levels.pdb" Configuration="Debug" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\levels\</RemoteDir>
+                        <RemoteName>Classic II Levels.pdb</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\levels\Classic II Levels.pdb" Configuration="Debug" Class="File">
                     <Platform Name="OSXARM64">
                         <RemoteDir>Contents\Resources\assets\levels\</RemoteDir>
+                        <RemoteName>Classic II Levels.pdb</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\levels\Classic II Levels.pdb" Configuration="Release" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\levels\</RemoteDir>
                         <RemoteName>Classic II Levels.pdb</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
@@ -1366,8 +2681,22 @@
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="assets\levels\Classic Levels.pdb" Configuration="Debug" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\levels\</RemoteDir>
+                        <RemoteName>Classic Levels.pdb</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\levels\Classic Levels.pdb" Configuration="Debug" Class="File">
                     <Platform Name="OSXARM64">
                         <RemoteDir>Contents\Resources\assets\levels\</RemoteDir>
+                        <RemoteName>Classic Levels.pdb</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\levels\Classic Levels.pdb" Configuration="Release" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\levels\</RemoteDir>
                         <RemoteName>Classic Levels.pdb</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
@@ -1380,8 +2709,22 @@
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="assets\levels\Confusion Pack.pdb" Configuration="Debug" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\levels\</RemoteDir>
+                        <RemoteName>Confusion Pack.pdb</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\levels\Confusion Pack.pdb" Configuration="Debug" Class="File">
                     <Platform Name="OSXARM64">
                         <RemoteDir>Contents\Resources\assets\levels\</RemoteDir>
+                        <RemoteName>Confusion Pack.pdb</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\levels\Confusion Pack.pdb" Configuration="Release" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\levels\</RemoteDir>
                         <RemoteName>Confusion Pack.pdb</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
@@ -1394,8 +2737,22 @@
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="assets\levels\Impossible Pack.pdb" Configuration="Debug" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\levels\</RemoteDir>
+                        <RemoteName>Impossible Pack.pdb</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\levels\Impossible Pack.pdb" Configuration="Debug" Class="File">
                     <Platform Name="OSXARM64">
                         <RemoteDir>Contents\Resources\assets\levels\</RemoteDir>
+                        <RemoteName>Impossible Pack.pdb</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\levels\Impossible Pack.pdb" Configuration="Release" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\levels\</RemoteDir>
                         <RemoteName>Impossible Pack.pdb</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
@@ -1408,8 +2765,22 @@
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="assets\levels\Panic Pack.pdb" Configuration="Debug" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\levels\</RemoteDir>
+                        <RemoteName>Panic Pack.pdb</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\levels\Panic Pack.pdb" Configuration="Debug" Class="File">
                     <Platform Name="OSXARM64">
                         <RemoteDir>Contents\Resources\assets\levels\</RemoteDir>
+                        <RemoteName>Panic Pack.pdb</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\levels\Panic Pack.pdb" Configuration="Release" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\levels\</RemoteDir>
                         <RemoteName>Panic Pack.pdb</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
@@ -1422,8 +2793,22 @@
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="assets\levels\Twister Levels.pdb" Configuration="Debug" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\levels\</RemoteDir>
+                        <RemoteName>Twister Levels.pdb</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\levels\Twister Levels.pdb" Configuration="Debug" Class="File">
                     <Platform Name="OSXARM64">
                         <RemoteDir>Contents\Resources\assets\levels\</RemoteDir>
+                        <RemoteName>Twister Levels.pdb</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\levels\Twister Levels.pdb" Configuration="Release" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\levels\</RemoteDir>
                         <RemoteName>Twister Levels.pdb</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
@@ -1436,8 +2821,22 @@
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="assets\levels\Variety 10 Pack.pdb" Configuration="Debug" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\levels\</RemoteDir>
+                        <RemoteName>Variety 10 Pack.pdb</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\levels\Variety 10 Pack.pdb" Configuration="Debug" Class="File">
                     <Platform Name="OSXARM64">
                         <RemoteDir>Contents\Resources\assets\levels\</RemoteDir>
+                        <RemoteName>Variety 10 Pack.pdb</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\levels\Variety 10 Pack.pdb" Configuration="Release" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\levels\</RemoteDir>
                         <RemoteName>Variety 10 Pack.pdb</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
@@ -1450,8 +2849,22 @@
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="assets\levels\Variety 11 Pack.pdb" Configuration="Debug" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\levels\</RemoteDir>
+                        <RemoteName>Variety 11 Pack.pdb</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\levels\Variety 11 Pack.pdb" Configuration="Debug" Class="File">
                     <Platform Name="OSXARM64">
                         <RemoteDir>Contents\Resources\assets\levels\</RemoteDir>
+                        <RemoteName>Variety 11 Pack.pdb</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\levels\Variety 11 Pack.pdb" Configuration="Release" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\levels\</RemoteDir>
                         <RemoteName>Variety 11 Pack.pdb</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
@@ -1464,8 +2877,22 @@
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="assets\levels\Variety 12 Pack.pdb" Configuration="Debug" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\levels\</RemoteDir>
+                        <RemoteName>Variety 12 Pack.pdb</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\levels\Variety 12 Pack.pdb" Configuration="Debug" Class="File">
                     <Platform Name="OSXARM64">
                         <RemoteDir>Contents\Resources\assets\levels\</RemoteDir>
+                        <RemoteName>Variety 12 Pack.pdb</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\levels\Variety 12 Pack.pdb" Configuration="Release" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\levels\</RemoteDir>
                         <RemoteName>Variety 12 Pack.pdb</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
@@ -1478,8 +2905,22 @@
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="assets\levels\Variety 13 Pack.pdb" Configuration="Debug" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\levels\</RemoteDir>
+                        <RemoteName>Variety 13 Pack.pdb</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\levels\Variety 13 Pack.pdb" Configuration="Debug" Class="File">
                     <Platform Name="OSXARM64">
                         <RemoteDir>Contents\Resources\assets\levels\</RemoteDir>
+                        <RemoteName>Variety 13 Pack.pdb</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\levels\Variety 13 Pack.pdb" Configuration="Release" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\levels\</RemoteDir>
                         <RemoteName>Variety 13 Pack.pdb</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
@@ -1492,8 +2933,22 @@
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="assets\levels\Variety 14 Pack.pdb" Configuration="Debug" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\levels\</RemoteDir>
+                        <RemoteName>Variety 14 Pack.pdb</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\levels\Variety 14 Pack.pdb" Configuration="Debug" Class="File">
                     <Platform Name="OSXARM64">
                         <RemoteDir>Contents\Resources\assets\levels\</RemoteDir>
+                        <RemoteName>Variety 14 Pack.pdb</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\levels\Variety 14 Pack.pdb" Configuration="Release" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\levels\</RemoteDir>
                         <RemoteName>Variety 14 Pack.pdb</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
@@ -1506,8 +2961,22 @@
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="assets\levels\Variety 15 Pack.pdb" Configuration="Debug" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\levels\</RemoteDir>
+                        <RemoteName>Variety 15 Pack.pdb</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\levels\Variety 15 Pack.pdb" Configuration="Debug" Class="File">
                     <Platform Name="OSXARM64">
                         <RemoteDir>Contents\Resources\assets\levels\</RemoteDir>
+                        <RemoteName>Variety 15 Pack.pdb</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\levels\Variety 15 Pack.pdb" Configuration="Release" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\levels\</RemoteDir>
                         <RemoteName>Variety 15 Pack.pdb</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
@@ -1520,8 +2989,22 @@
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="assets\levels\Variety 16 Pack.pdb" Configuration="Debug" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\levels\</RemoteDir>
+                        <RemoteName>Variety 16 Pack.pdb</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\levels\Variety 16 Pack.pdb" Configuration="Debug" Class="File">
                     <Platform Name="OSXARM64">
                         <RemoteDir>Contents\Resources\assets\levels\</RemoteDir>
+                        <RemoteName>Variety 16 Pack.pdb</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\levels\Variety 16 Pack.pdb" Configuration="Release" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\levels\</RemoteDir>
                         <RemoteName>Variety 16 Pack.pdb</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
@@ -1534,8 +3017,22 @@
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="assets\levels\Variety 17 Pack.pdb" Configuration="Debug" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\levels\</RemoteDir>
+                        <RemoteName>Variety 17 Pack.pdb</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\levels\Variety 17 Pack.pdb" Configuration="Debug" Class="File">
                     <Platform Name="OSXARM64">
                         <RemoteDir>Contents\Resources\assets\levels\</RemoteDir>
+                        <RemoteName>Variety 17 Pack.pdb</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\levels\Variety 17 Pack.pdb" Configuration="Release" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\levels\</RemoteDir>
                         <RemoteName>Variety 17 Pack.pdb</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
@@ -1548,8 +3045,22 @@
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="assets\levels\Variety 18 Pack.pdb" Configuration="Debug" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\levels\</RemoteDir>
+                        <RemoteName>Variety 18 Pack.pdb</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\levels\Variety 18 Pack.pdb" Configuration="Debug" Class="File">
                     <Platform Name="OSXARM64">
                         <RemoteDir>Contents\Resources\assets\levels\</RemoteDir>
+                        <RemoteName>Variety 18 Pack.pdb</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\levels\Variety 18 Pack.pdb" Configuration="Release" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\levels\</RemoteDir>
                         <RemoteName>Variety 18 Pack.pdb</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
@@ -1562,8 +3073,22 @@
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="assets\levels\Variety 19 Pack.pdb" Configuration="Debug" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\levels\</RemoteDir>
+                        <RemoteName>Variety 19 Pack.pdb</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\levels\Variety 19 Pack.pdb" Configuration="Debug" Class="File">
                     <Platform Name="OSXARM64">
                         <RemoteDir>Contents\Resources\assets\levels\</RemoteDir>
+                        <RemoteName>Variety 19 Pack.pdb</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\levels\Variety 19 Pack.pdb" Configuration="Release" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\levels\</RemoteDir>
                         <RemoteName>Variety 19 Pack.pdb</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
@@ -1576,8 +3101,22 @@
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="assets\levels\Variety 20 Pack.pdb" Configuration="Debug" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\levels\</RemoteDir>
+                        <RemoteName>Variety 20 Pack.pdb</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\levels\Variety 20 Pack.pdb" Configuration="Debug" Class="File">
                     <Platform Name="OSXARM64">
                         <RemoteDir>Contents\Resources\assets\levels\</RemoteDir>
+                        <RemoteName>Variety 20 Pack.pdb</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\levels\Variety 20 Pack.pdb" Configuration="Release" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\levels\</RemoteDir>
                         <RemoteName>Variety 20 Pack.pdb</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
@@ -1590,8 +3129,22 @@
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="assets\levels\Variety 21 Pack.pdb" Configuration="Debug" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\levels\</RemoteDir>
+                        <RemoteName>Variety 21 Pack.pdb</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\levels\Variety 21 Pack.pdb" Configuration="Debug" Class="File">
                     <Platform Name="OSXARM64">
                         <RemoteDir>Contents\Resources\assets\levels\</RemoteDir>
+                        <RemoteName>Variety 21 Pack.pdb</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\levels\Variety 21 Pack.pdb" Configuration="Release" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\levels\</RemoteDir>
                         <RemoteName>Variety 21 Pack.pdb</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
@@ -1604,8 +3157,22 @@
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="assets\levels\Variety 22 Pack.pdb" Configuration="Debug" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\levels\</RemoteDir>
+                        <RemoteName>Variety 22 Pack.pdb</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\levels\Variety 22 Pack.pdb" Configuration="Debug" Class="File">
                     <Platform Name="OSXARM64">
                         <RemoteDir>Contents\Resources\assets\levels\</RemoteDir>
+                        <RemoteName>Variety 22 Pack.pdb</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\levels\Variety 22 Pack.pdb" Configuration="Release" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\levels\</RemoteDir>
                         <RemoteName>Variety 22 Pack.pdb</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
@@ -1618,8 +3185,22 @@
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="assets\levels\Variety 23 Pack.pdb" Configuration="Debug" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\levels\</RemoteDir>
+                        <RemoteName>Variety 23 Pack.pdb</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\levels\Variety 23 Pack.pdb" Configuration="Debug" Class="File">
                     <Platform Name="OSXARM64">
                         <RemoteDir>Contents\Resources\assets\levels\</RemoteDir>
+                        <RemoteName>Variety 23 Pack.pdb</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\levels\Variety 23 Pack.pdb" Configuration="Release" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\levels\</RemoteDir>
                         <RemoteName>Variety 23 Pack.pdb</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
@@ -1632,8 +3213,22 @@
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="assets\levels\Variety 24 Pack.pdb" Configuration="Debug" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\levels\</RemoteDir>
+                        <RemoteName>Variety 24 Pack.pdb</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\levels\Variety 24 Pack.pdb" Configuration="Debug" Class="File">
                     <Platform Name="OSXARM64">
                         <RemoteDir>Contents\Resources\assets\levels\</RemoteDir>
+                        <RemoteName>Variety 24 Pack.pdb</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\levels\Variety 24 Pack.pdb" Configuration="Release" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\levels\</RemoteDir>
                         <RemoteName>Variety 24 Pack.pdb</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
@@ -1646,8 +3241,22 @@
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="assets\levels\Variety 25 Pack.pdb" Configuration="Debug" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\levels\</RemoteDir>
+                        <RemoteName>Variety 25 Pack.pdb</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\levels\Variety 25 Pack.pdb" Configuration="Debug" Class="File">
                     <Platform Name="OSXARM64">
                         <RemoteDir>Contents\Resources\assets\levels\</RemoteDir>
+                        <RemoteName>Variety 25 Pack.pdb</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\levels\Variety 25 Pack.pdb" Configuration="Release" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\levels\</RemoteDir>
                         <RemoteName>Variety 25 Pack.pdb</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
@@ -1660,8 +3269,22 @@
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="assets\levels\Variety 26 Pack.pdb" Configuration="Debug" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\levels\</RemoteDir>
+                        <RemoteName>Variety 26 Pack.pdb</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\levels\Variety 26 Pack.pdb" Configuration="Debug" Class="File">
                     <Platform Name="OSXARM64">
                         <RemoteDir>Contents\Resources\assets\levels\</RemoteDir>
+                        <RemoteName>Variety 26 Pack.pdb</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\levels\Variety 26 Pack.pdb" Configuration="Release" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\levels\</RemoteDir>
                         <RemoteName>Variety 26 Pack.pdb</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
@@ -1674,8 +3297,22 @@
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="assets\levels\Variety 27 Pack.pdb" Configuration="Debug" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\levels\</RemoteDir>
+                        <RemoteName>Variety 27 Pack.pdb</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\levels\Variety 27 Pack.pdb" Configuration="Debug" Class="File">
                     <Platform Name="OSXARM64">
                         <RemoteDir>Contents\Resources\assets\levels\</RemoteDir>
+                        <RemoteName>Variety 27 Pack.pdb</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\levels\Variety 27 Pack.pdb" Configuration="Release" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\levels\</RemoteDir>
                         <RemoteName>Variety 27 Pack.pdb</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
@@ -1688,8 +3325,22 @@
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="assets\levels\Variety 28 Pack.pdb" Configuration="Debug" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\levels\</RemoteDir>
+                        <RemoteName>Variety 28 Pack.pdb</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\levels\Variety 28 Pack.pdb" Configuration="Debug" Class="File">
                     <Platform Name="OSXARM64">
                         <RemoteDir>Contents\Resources\assets\levels\</RemoteDir>
+                        <RemoteName>Variety 28 Pack.pdb</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\levels\Variety 28 Pack.pdb" Configuration="Release" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\levels\</RemoteDir>
                         <RemoteName>Variety 28 Pack.pdb</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
@@ -1702,8 +3353,22 @@
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="assets\levels\Variety 29 Pack.pdb" Configuration="Debug" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\levels\</RemoteDir>
+                        <RemoteName>Variety 29 Pack.pdb</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\levels\Variety 29 Pack.pdb" Configuration="Debug" Class="File">
                     <Platform Name="OSXARM64">
                         <RemoteDir>Contents\Resources\assets\levels\</RemoteDir>
+                        <RemoteName>Variety 29 Pack.pdb</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\levels\Variety 29 Pack.pdb" Configuration="Release" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\levels\</RemoteDir>
                         <RemoteName>Variety 29 Pack.pdb</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
@@ -1716,8 +3381,22 @@
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="assets\levels\Variety 3 Pack.pdb" Configuration="Debug" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\levels\</RemoteDir>
+                        <RemoteName>Variety 3 Pack.pdb</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\levels\Variety 3 Pack.pdb" Configuration="Debug" Class="File">
                     <Platform Name="OSXARM64">
                         <RemoteDir>Contents\Resources\assets\levels\</RemoteDir>
+                        <RemoteName>Variety 3 Pack.pdb</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\levels\Variety 3 Pack.pdb" Configuration="Release" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\levels\</RemoteDir>
                         <RemoteName>Variety 3 Pack.pdb</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
@@ -1730,8 +3409,22 @@
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="assets\levels\Variety 30 Pack.pdb" Configuration="Debug" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\levels\</RemoteDir>
+                        <RemoteName>Variety 30 Pack.pdb</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\levels\Variety 30 Pack.pdb" Configuration="Debug" Class="File">
                     <Platform Name="OSXARM64">
                         <RemoteDir>Contents\Resources\assets\levels\</RemoteDir>
+                        <RemoteName>Variety 30 Pack.pdb</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\levels\Variety 30 Pack.pdb" Configuration="Release" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\levels\</RemoteDir>
                         <RemoteName>Variety 30 Pack.pdb</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
@@ -1744,8 +3437,22 @@
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="assets\levels\Variety 31 Pack.pdb" Configuration="Debug" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\levels\</RemoteDir>
+                        <RemoteName>Variety 31 Pack.pdb</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\levels\Variety 31 Pack.pdb" Configuration="Debug" Class="File">
                     <Platform Name="OSXARM64">
                         <RemoteDir>Contents\Resources\assets\levels\</RemoteDir>
+                        <RemoteName>Variety 31 Pack.pdb</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\levels\Variety 31 Pack.pdb" Configuration="Release" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\levels\</RemoteDir>
                         <RemoteName>Variety 31 Pack.pdb</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
@@ -1758,8 +3465,22 @@
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="assets\levels\Variety 32 Pack.pdb" Configuration="Debug" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\levels\</RemoteDir>
+                        <RemoteName>Variety 32 Pack.pdb</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\levels\Variety 32 Pack.pdb" Configuration="Debug" Class="File">
                     <Platform Name="OSXARM64">
                         <RemoteDir>Contents\Resources\assets\levels\</RemoteDir>
+                        <RemoteName>Variety 32 Pack.pdb</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\levels\Variety 32 Pack.pdb" Configuration="Release" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\levels\</RemoteDir>
                         <RemoteName>Variety 32 Pack.pdb</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
@@ -1772,8 +3493,22 @@
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="assets\levels\Variety 33 Pack.pdb" Configuration="Debug" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\levels\</RemoteDir>
+                        <RemoteName>Variety 33 Pack.pdb</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\levels\Variety 33 Pack.pdb" Configuration="Debug" Class="File">
                     <Platform Name="OSXARM64">
                         <RemoteDir>Contents\Resources\assets\levels\</RemoteDir>
+                        <RemoteName>Variety 33 Pack.pdb</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\levels\Variety 33 Pack.pdb" Configuration="Release" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\levels\</RemoteDir>
                         <RemoteName>Variety 33 Pack.pdb</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
@@ -1786,8 +3521,22 @@
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="assets\levels\Variety 34 Pack.pdb" Configuration="Debug" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\levels\</RemoteDir>
+                        <RemoteName>Variety 34 Pack.pdb</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\levels\Variety 34 Pack.pdb" Configuration="Debug" Class="File">
                     <Platform Name="OSXARM64">
                         <RemoteDir>Contents\Resources\assets\levels\</RemoteDir>
+                        <RemoteName>Variety 34 Pack.pdb</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\levels\Variety 34 Pack.pdb" Configuration="Release" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\levels\</RemoteDir>
                         <RemoteName>Variety 34 Pack.pdb</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
@@ -1800,8 +3549,22 @@
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="assets\levels\Variety 35 Pack.pdb" Configuration="Debug" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\levels\</RemoteDir>
+                        <RemoteName>Variety 35 Pack.pdb</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\levels\Variety 35 Pack.pdb" Configuration="Debug" Class="File">
                     <Platform Name="OSXARM64">
                         <RemoteDir>Contents\Resources\assets\levels\</RemoteDir>
+                        <RemoteName>Variety 35 Pack.pdb</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\levels\Variety 35 Pack.pdb" Configuration="Release" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\levels\</RemoteDir>
                         <RemoteName>Variety 35 Pack.pdb</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
@@ -1814,8 +3577,22 @@
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="assets\levels\Variety 36 Pack.pdb" Configuration="Debug" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\levels\</RemoteDir>
+                        <RemoteName>Variety 36 Pack.pdb</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\levels\Variety 36 Pack.pdb" Configuration="Debug" Class="File">
                     <Platform Name="OSXARM64">
                         <RemoteDir>Contents\Resources\assets\levels\</RemoteDir>
+                        <RemoteName>Variety 36 Pack.pdb</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\levels\Variety 36 Pack.pdb" Configuration="Release" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\levels\</RemoteDir>
                         <RemoteName>Variety 36 Pack.pdb</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
@@ -1828,8 +3605,22 @@
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="assets\levels\Variety 37 Pack.pdb" Configuration="Debug" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\levels\</RemoteDir>
+                        <RemoteName>Variety 37 Pack.pdb</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\levels\Variety 37 Pack.pdb" Configuration="Debug" Class="File">
                     <Platform Name="OSXARM64">
                         <RemoteDir>Contents\Resources\assets\levels\</RemoteDir>
+                        <RemoteName>Variety 37 Pack.pdb</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\levels\Variety 37 Pack.pdb" Configuration="Release" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\levels\</RemoteDir>
                         <RemoteName>Variety 37 Pack.pdb</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
@@ -1842,8 +3633,22 @@
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="assets\levels\Variety 38 Pack.pdb" Configuration="Debug" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\levels\</RemoteDir>
+                        <RemoteName>Variety 38 Pack.pdb</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\levels\Variety 38 Pack.pdb" Configuration="Debug" Class="File">
                     <Platform Name="OSXARM64">
                         <RemoteDir>Contents\Resources\assets\levels\</RemoteDir>
+                        <RemoteName>Variety 38 Pack.pdb</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\levels\Variety 38 Pack.pdb" Configuration="Release" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\levels\</RemoteDir>
                         <RemoteName>Variety 38 Pack.pdb</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
@@ -1856,8 +3661,22 @@
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="assets\levels\Variety 39 Pack.pdb" Configuration="Debug" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\levels\</RemoteDir>
+                        <RemoteName>Variety 39 Pack.pdb</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\levels\Variety 39 Pack.pdb" Configuration="Debug" Class="File">
                     <Platform Name="OSXARM64">
                         <RemoteDir>Contents\Resources\assets\levels\</RemoteDir>
+                        <RemoteName>Variety 39 Pack.pdb</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\levels\Variety 39 Pack.pdb" Configuration="Release" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\levels\</RemoteDir>
                         <RemoteName>Variety 39 Pack.pdb</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
@@ -1870,8 +3689,22 @@
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="assets\levels\Variety 4 Pack.pdb" Configuration="Debug" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\levels\</RemoteDir>
+                        <RemoteName>Variety 4 Pack.pdb</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\levels\Variety 4 Pack.pdb" Configuration="Debug" Class="File">
                     <Platform Name="OSXARM64">
                         <RemoteDir>Contents\Resources\assets\levels\</RemoteDir>
+                        <RemoteName>Variety 4 Pack.pdb</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\levels\Variety 4 Pack.pdb" Configuration="Release" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\levels\</RemoteDir>
                         <RemoteName>Variety 4 Pack.pdb</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
@@ -1884,8 +3717,22 @@
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="assets\levels\Variety 40 Pack.pdb" Configuration="Debug" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\levels\</RemoteDir>
+                        <RemoteName>Variety 40 Pack.pdb</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\levels\Variety 40 Pack.pdb" Configuration="Debug" Class="File">
                     <Platform Name="OSXARM64">
                         <RemoteDir>Contents\Resources\assets\levels\</RemoteDir>
+                        <RemoteName>Variety 40 Pack.pdb</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\levels\Variety 40 Pack.pdb" Configuration="Release" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\levels\</RemoteDir>
                         <RemoteName>Variety 40 Pack.pdb</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
@@ -1898,8 +3745,22 @@
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="assets\levels\Variety 41 Pack.pdb" Configuration="Debug" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\levels\</RemoteDir>
+                        <RemoteName>Variety 41 Pack.pdb</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\levels\Variety 41 Pack.pdb" Configuration="Debug" Class="File">
                     <Platform Name="OSXARM64">
                         <RemoteDir>Contents\Resources\assets\levels\</RemoteDir>
+                        <RemoteName>Variety 41 Pack.pdb</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\levels\Variety 41 Pack.pdb" Configuration="Release" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\levels\</RemoteDir>
                         <RemoteName>Variety 41 Pack.pdb</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
@@ -1912,8 +3773,22 @@
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="assets\levels\Variety 5 Pack.pdb" Configuration="Debug" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\levels\</RemoteDir>
+                        <RemoteName>Variety 5 Pack.pdb</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\levels\Variety 5 Pack.pdb" Configuration="Debug" Class="File">
                     <Platform Name="OSXARM64">
                         <RemoteDir>Contents\Resources\assets\levels\</RemoteDir>
+                        <RemoteName>Variety 5 Pack.pdb</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\levels\Variety 5 Pack.pdb" Configuration="Release" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\levels\</RemoteDir>
                         <RemoteName>Variety 5 Pack.pdb</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
@@ -1926,8 +3801,22 @@
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="assets\levels\Variety 6 Pack.pdb" Configuration="Debug" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\levels\</RemoteDir>
+                        <RemoteName>Variety 6 Pack.pdb</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\levels\Variety 6 Pack.pdb" Configuration="Debug" Class="File">
                     <Platform Name="OSXARM64">
                         <RemoteDir>Contents\Resources\assets\levels\</RemoteDir>
+                        <RemoteName>Variety 6 Pack.pdb</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\levels\Variety 6 Pack.pdb" Configuration="Release" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\levels\</RemoteDir>
                         <RemoteName>Variety 6 Pack.pdb</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
@@ -1940,8 +3829,22 @@
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="assets\levels\Variety 7 Pack.pdb" Configuration="Debug" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\levels\</RemoteDir>
+                        <RemoteName>Variety 7 Pack.pdb</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\levels\Variety 7 Pack.pdb" Configuration="Debug" Class="File">
                     <Platform Name="OSXARM64">
                         <RemoteDir>Contents\Resources\assets\levels\</RemoteDir>
+                        <RemoteName>Variety 7 Pack.pdb</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\levels\Variety 7 Pack.pdb" Configuration="Release" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\levels\</RemoteDir>
                         <RemoteName>Variety 7 Pack.pdb</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
@@ -1954,8 +3857,22 @@
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="assets\levels\Variety 8 Pack.pdb" Configuration="Debug" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\levels\</RemoteDir>
+                        <RemoteName>Variety 8 Pack.pdb</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\levels\Variety 8 Pack.pdb" Configuration="Debug" Class="File">
                     <Platform Name="OSXARM64">
                         <RemoteDir>Contents\Resources\assets\levels\</RemoteDir>
+                        <RemoteName>Variety 8 Pack.pdb</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\levels\Variety 8 Pack.pdb" Configuration="Release" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\levels\</RemoteDir>
                         <RemoteName>Variety 8 Pack.pdb</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
@@ -1968,8 +3885,22 @@
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="assets\levels\Variety 9 Pack.pdb" Configuration="Debug" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\levels\</RemoteDir>
+                        <RemoteName>Variety 9 Pack.pdb</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\levels\Variety 9 Pack.pdb" Configuration="Debug" Class="File">
                     <Platform Name="OSXARM64">
                         <RemoteDir>Contents\Resources\assets\levels\</RemoteDir>
+                        <RemoteName>Variety 9 Pack.pdb</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\levels\Variety 9 Pack.pdb" Configuration="Release" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\levels\</RemoteDir>
                         <RemoteName>Variety 9 Pack.pdb</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
@@ -1982,8 +3913,22 @@
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="assets\levels\Variety II Pack.pdb" Configuration="Debug" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\levels\</RemoteDir>
+                        <RemoteName>Variety II Pack.pdb</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\levels\Variety II Pack.pdb" Configuration="Debug" Class="File">
                     <Platform Name="OSXARM64">
                         <RemoteDir>Contents\Resources\assets\levels\</RemoteDir>
+                        <RemoteName>Variety II Pack.pdb</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\levels\Variety II Pack.pdb" Configuration="Release" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\levels\</RemoteDir>
                         <RemoteName>Variety II Pack.pdb</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
@@ -1996,8 +3941,22 @@
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="assets\levels\Variety Pack.pdb" Configuration="Debug" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\levels\</RemoteDir>
+                        <RemoteName>Variety Pack.pdb</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\levels\Variety Pack.pdb" Configuration="Debug" Class="File">
                     <Platform Name="OSXARM64">
                         <RemoteDir>Contents\Resources\assets\levels\</RemoteDir>
+                        <RemoteName>Variety Pack.pdb</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\levels\Variety Pack.pdb" Configuration="Release" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\assets\levels\</RemoteDir>
                         <RemoteName>Variety Pack.pdb</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
@@ -2006,6 +3965,35 @@
                     <Platform Name="OSXARM64">
                         <RemoteDir>Contents\Resources\assets\levels\</RemoteDir>
                         <RemoteName>Variety Pack.pdb</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="iOSDevice64\Debug\Vexed.dSYM" Configuration="Debug" Class="ProjectiOSDeviceDebug">
+                    <Platform Name="iOSDevice64">
+                        <RemoteName>Vexed</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="iOSDevice64\Debug\Vexed.entitlements" Configuration="Debug" Class="ProjectiOSEntitlements">
+                    <Platform Name="iOSDevice64">
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="iOSDevice64\Debug\Vexed.info.plist" Configuration="Debug" Class="ProjectiOSInfoPList">
+                    <Platform Name="iOSDevice64">
+                        <RemoteName>Info.plist</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="iOSDevice64\Debug\Vexed.launchscreen" Configuration="Debug" Class="ProjectiOSLaunchScreen">
+                    <Platform Name="iOSDevice64">
+                        <Operation>64</Operation>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="iOSDevice64\Debug\Vexed" Configuration="Debug" Class="ProjectOutput">
+                    <Platform Name="iOSDevice64">
+                        <RemoteName>Vexed</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>

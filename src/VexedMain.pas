@@ -84,10 +84,9 @@ begin
   // Mac and Linux paths are provisional holding places
   // Need proper paths investigating and setting for deployment
   AssetsRoot := GetAssetsPath('../..');
-  {$IF DEFINED(MSWINDOWS)}
-  if DirectoryExists('assets') then
-    AssetsRoot := String.Empty;
-  {$IFEND}
+
+//  ShowMessage('AssetsRoot : ' + AssetsRoot);
+
   if(not DirectoryExists(AssetsRoot)) then
     exit;
 
@@ -152,9 +151,13 @@ begin
   {$IFEND}
   if Puzzles.Count = 0 then
     begin
+//      ShowMessage('No Levels in ' + AssetsRoot);
       DebugAdd(AssetsRoot + 'assets/levels');
       exit;
     end;
+//  else
+//    ShowMessage('Levels found in ' + AssetsRoot);
+
 
   for I := 0 to Puzzles.Count - 1 do
     T := T + Puzzles[I].Count;
