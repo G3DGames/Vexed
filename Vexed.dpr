@@ -3,7 +3,6 @@ program Vexed;
 uses
   System.StartUpCopy,
   FMX.Forms,
-  FMX.Skia,
   VexedMain in 'src\VexedMain.pas' {Form1},
   {$if defined(MSWINDOWS)}
   DisplayData in 'common\DisplayData.pas',
@@ -29,8 +28,8 @@ uses
 // {$define POWERSAVE}
 
 begin
-  GlobalUseSkia := True;
-  GlobalUseSkiaRasterWhenAvailable := False;
+
+//  GlobalUseSkiaRasterWhenAvailable := False;
   { Report any dumb memory leaks - switch to false for release }
   ReportMemoryLeaksOnShutdown := True;
 {$if defined(MSWINDOWS)}
